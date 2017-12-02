@@ -328,6 +328,8 @@ public class ExcelUtil {
 	 * 导出数据到第一个sheet
 	 * @param template
 	 *            excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param xls
 	 *            excel文件格式,true:*.xls|false:xlsx
 	 * @param infos
@@ -342,7 +344,9 @@ public class ExcelUtil {
 	}
 	/**
 	 * @param template
-	 *            excel模板
+	 *           excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param xls
 	 *            excel文件格式,true:*.xls|false:xlsx
 	 * @param infos
@@ -485,7 +489,9 @@ public class ExcelUtil {
 	/**
 	 * 导出数据到第一个sheet
 	 * @param template
-	 *            excel模板
+	 *          excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *           sheet1的信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
@@ -499,6 +505,8 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            根据index分别存储对应sheet的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
@@ -531,6 +539,8 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            sheet1的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
@@ -542,6 +552,8 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
+	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
+	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            根据index分别存储对应sheet的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
