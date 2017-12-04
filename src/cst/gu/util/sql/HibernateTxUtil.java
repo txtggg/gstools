@@ -10,7 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.engine.SessionFactoryImplementor;
 
-import cst.gu.util.map.MapUtil;
+import cst.gu.util.container.Containers;
 
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
@@ -26,8 +26,7 @@ import cst.gu.util.map.MapUtil;
 public abstract class HibernateTxUtil extends SqlTxUtil{
 	private static ConnectionProvider cp = null;
 	private Long thid = null;
-	private static Map<Long, Connection> txConns = MapUtil.newHashMap();
-	private static Map<Long, Session> txSessions = MapUtil.newHashMap();
+	private static Map<Long, Session> txSessions = Containers.newHashMap();
 
 	private boolean tx = false;
 	private Session session;
@@ -35,7 +34,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	public abstract Session getSession();
 	public HibernateTxUtil() {
 		thid = Thread.currentThread().getId();
-		if (txSessions.containsKey(thid) && txConns.containsKey(thid)) {
+		if (txSessions.containsKey(thid) ) {
 			tx = true;
 		}
 	}
@@ -61,6 +60,10 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		session = getSession();
 		session.beginTransaction();
 		super.beginTx();
+		System.out.println("hibernate事务开启------------------------>");
+		System.out.println(thid);
+		System.out.println(txSessions);
+		System.out.println(session);
 		tx = true;
 
 		return this;
@@ -71,6 +74,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 			throw new RuntimeException("事务尚未开启");
 		}
 		session.getTransaction().rollback();
+		super.rollBack();
 		return this;
 	}
 
@@ -96,6 +100,10 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		txSessions.remove(thid);
 		super.endTx();
 		tx = false;
+		System.out.println("hibernate事务结束------------------------>");
+		System.out.println(thid);
+		System.out.println(txSessions);
+		System.out.println(session);
 		return this;
 	}
 
@@ -188,8 +196,10 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 
 	private void getTxSession() {
 		if (tx) {
+			System.out.println("事务已开启,从线程中中获取session");
 			session = txSessions.get(thid);
 		} else {
+			System.out.println("事务已开启,直接获取session");
 			session = getSession();
 		}
 	}
@@ -197,6 +207,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	private void closeSession() {
 		if (!tx) {
 			if (session != null && session.isOpen()) {
+				System.out.println("非事务,关闭session");
 				session.flush();
 				session.close();
 			}

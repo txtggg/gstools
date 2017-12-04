@@ -139,7 +139,63 @@ public class StringUtil extends ObjectUtil {
 		return null;
 
 	}
-
+	
+	/**
+	 * 所有字段都为空(null或者"")
+	 * @param str
+	 * @return
+	 */
+	public static boolean allBlank(String... strs) {
+		for (String str : strs) {
+			if (str != null && str.length() > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * 至少有一个参数为空(null或者trim后为空)
+	 * @param str
+	 * @return
+	 */
+	public static boolean containsBlank(String... strs) {
+		for (String str : strs) {
+			if (str == null || str.isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	/**
+	 * 所有字段trim后都为空(null或者"")
+	 * @param str
+	 * @return
+	 */
+	public static boolean allTrimBlank(String... strs) {
+		for (String str : strs) {
+			if (str != null && str.trim().length() > 0) {
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/**
+	 * 至少有一个参数为空(null或者trim后为空)
+	 * @param str
+	 * @return
+	 */
+	public static boolean containsTrimBlank(String... strs) {
+		for (String str : strs) {
+			if (str == null || str.trim().isEmpty()) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	/**
 	 * 判断字段为空白(=null 或者length=0 )
 	 * 

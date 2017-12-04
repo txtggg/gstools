@@ -6,8 +6,7 @@ import java.util.Map;
 
 import cst.gu.util.annotation.AnnoBeanUtil;
 import cst.gu.util.annotation.AnnoUtil;
-import cst.gu.util.collection.ListUtil;
-import cst.gu.util.map.MapUtil;
+import cst.gu.util.container.Containers;
 import cst.gu.util.sql.SqlMaker;
 
 /**
@@ -21,9 +20,9 @@ import cst.gu.util.sql.SqlMaker;
  * 
  */
 public class MysqlMaker implements SqlMaker {
-	private static Map<String,String> sqlMap = MapUtil.newHashMap();
-	private static Map<String,Field[]> fieldsMap = MapUtil.newHashMap();
-	private static Map<String,Field> pkMap = MapUtil.newHashMap();
+	private static Map<String,String> sqlMap = Containers.newHashMap();
+	private static Map<String,Field[]> fieldsMap = Containers.newHashMap();
+	private static Map<String,Field> pkMap = Containers.newHashMap();
 	private Object bean;
 	private Class<?> clz;
 	private String clzName;
@@ -195,7 +194,7 @@ public class MysqlMaker implements SqlMaker {
 		pkf = pkMap.get(clzName);
 		if(fields == null){
 			Field[] fs = clz.getDeclaredFields();
-			List<Field> flist = ListUtil.newArrayList();
+			List<Field> flist = Containers.newArrayList();
 			for(int x =0;x<fs.length;x++){
 				Field f = fs[x];
 				if(!f.getType().getName().equals("java.util.Set")){

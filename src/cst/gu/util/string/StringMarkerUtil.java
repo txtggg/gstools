@@ -4,8 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-
-import cst.gu.util.collection.ListUtil;
+import cst.gu.util.container.Containers;
 import cst.gu.util.file.FileUtil;
 
 /**
@@ -56,7 +55,7 @@ public class StringMarkerUtil {
 	}
 
 	private static String replaceList(String content, List<Map<String, Object>> list, int[] flag) {
-		if (!ListUtil.isEmpty(list) && StringUtil.isNotBlank(content)) {
+		if (!Containers.isEmpty(list) && StringUtil.isNotBlank(content)) {
 			int[] arr = { 0 };
 			StringBuilder sb = new StringBuilder();
 			for (int x = 0; x < list.size(); x++) {

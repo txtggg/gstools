@@ -8,14 +8,13 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import cst.gu.util.bean.BeanUtil;
-import cst.gu.util.collection.ListUtil;
-import cst.gu.util.collection.SetUtil;
-import cst.gu.util.map.MapUtil;
+import cst.gu.util.container.Containers;
 import cst.gu.util.sql.impl.MysqlMaker;
 import cst.gu.util.string.StringUtil;
 
@@ -24,15 +23,23 @@ import cst.gu.util.string.StringUtil;
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
  */
 public abstract class SqlTxUtil {
-	private Long thid =  null ;
-	private static  Map<Long,Connection> txConns = MapUtil.newHashMap();
+	private Long thid = null;
+	private static Map<Long, Connection> txConns = Containers.newHashMap();
 	private boolean tx = false;
 	private Connection conn;
 
 	protected abstract Connection getConnection();
 
+	public SqlTxUtil() {
+		thid = Thread.currentThread().getId();
+		if (txConns.containsKey(thid)) {
+			tx = true;
+		}
+	}
+
 	/**************************************************** transaction ***************************************************/
 	public synchronized SqlTxUtil beginTx() {
+
 		if (tx) {
 			throw new RuntimeException("事务已经开启");
 		}
@@ -52,6 +59,10 @@ public abstract class SqlTxUtil {
 			throw new RuntimeException(e);
 		}
 		tx = true;
+		System.out.println("sql 事务 开启------------------------>");
+		System.out.println(conn);
+		System.out.println(txConns);
+		System.out.println(thid);
 		return this;
 	}
 
@@ -81,9 +92,11 @@ public abstract class SqlTxUtil {
 
 	/**
 	 * 关闭事务
+	 * 
 	 * @return
 	 */
 	public SqlTxUtil endTx() {
+
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
@@ -95,19 +108,21 @@ public abstract class SqlTxUtil {
 			throw new RuntimeException(e);
 		}
 		tx = false;
+		System.out.println("sql 事务 结束------------------------>");
+		System.out.println(conn);
+		System.out.println(txConns);
+		System.out.println(thid);
 		return this;
 	}
-	
-	
+
 	/**************************************************** jdbc ***************************************************/
-	
+
 	/**
 	 * 
 	 * @param sql
 	 * @param objects
 	 *            参数占位符？
-	 * @return 执行结果影响的行数
-	 * 返回 -1 表示执行有问题(发生异常会抛出运行时异常)
+	 * @return 执行结果影响的行数 返回 -1 表示执行有问题(发生异常会抛出运行时异常)
 	 */
 	public int update(String sql, Object... obj) {
 		getTxConn();
@@ -124,17 +139,29 @@ public abstract class SqlTxUtil {
 		}
 		return count;
 	}
-	
-	public int updateBean(Object o){
+
+	/**
+	 * 根据bean执行单表的更新 
+	 * 生成sql,通过jdbc进行执行
+	 * @param o
+	 * @return
+	 */
+	public int updateBean(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.update();
-		return update(mk.getSql(),mk.getParams());
+		return update(mk.getSql(), mk.getParams());
 	}
-	
-	public int deleteBean(Object o){
+
+	/**
+	 * 根据bean执行单表的删除 
+	 * 生成sql,通过jdbc进行执行
+	 * @param o
+	 * @return
+	 */
+	public int deleteBean(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.delete();
-		return update(mk.getSql(),mk.getParams());
+		return update(mk.getSql(), mk.getParams());
 	}
 
 	/**
@@ -145,14 +172,14 @@ public abstract class SqlTxUtil {
 	 * @param obj
 	 *            占位符实际参数
 	 * @throws RuntimeException
-	 * @return 返回主键(如果不需要主键,则使用update也可以) 
+	 * @return 返回主键(如果不需要主键,则使用update也可以)
 	 */
 	public int insert(String sql, Object... obj) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		try {
 			getTxConn();
-			pst = conn.prepareStatement(sql,Statement.RETURN_GENERATED_KEYS);
+			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			setParams(pst, obj);
 			pst.executeUpdate();
 			int id = 0;
@@ -167,27 +194,34 @@ public abstract class SqlTxUtil {
 			closeAll(pst, rs);
 		}
 	}
-	
-	public int insertBean(Object o){
+
+	/**
+	 * 根据bean执行单表的删除  生成sql,通过jdbc进行执行
+	 * 执行后并不会自动赋值bean对象,需要手动处理
+	 * @param o
+	 * @return
+	 */
+	public int insertBean(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.insert();
-		return insert(mk.getSql(),mk.getParams());
+		return insert(mk.getSql(), mk.getParams());
 	}
-	
+
 	/**
-	 * 根据传入的对象,查询sql,并将数据插入对象中
+	 * 根据传入的bean,查询sql,并将数据插入对象中,生成sql,通过jdbc进行执行
+	 * 
 	 * @param t
 	 */
-	public void getBean(Object bean){
+	public void getBean(Object bean) {
 		SqlMaker mk = new MysqlMaker(bean);
 		mk.select();
-		Map<String, Object> m = query(mk.getSql(),mk.getParams());
-		BeanUtil.fillValueWithAnnotation(bean, query(mk.getSql(),m));
+		Map<String, Object> m = query(mk.getSql(), mk.getParams());
+		BeanUtil.fillValueWithAnnotation(bean, query(mk.getSql(), m));
 	}
-	
+
 	public List<Map<String, Object>> queryList(String sql, Object... objs) {
 		getTxConn();
-		List<Map<String, Object>> rowList = ListUtil.newArrayList();
+		List<Map<String, Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -197,7 +231,7 @@ public abstract class SqlTxUtil {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 			while (rs.next()) {
-				Map<String, Object> row = MapUtil.newHashMap();
+				Map<String, Object> row = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; i++) {
 					row.put(rsmd.getColumnName(i), rs.getObject(i));
 				}
@@ -213,7 +247,7 @@ public abstract class SqlTxUtil {
 
 	public List<Map<String, Object>> queryListWithBlob(String charset, String sql, Object... obj) {
 		getTxConn();
-		List<Map<String, Object>> rowList = ListUtil.newArrayList();
+		List<Map<String,Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -223,7 +257,7 @@ public abstract class SqlTxUtil {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 			while (rs.next()) {
-				Map<String, Object> row = MapUtil.newHashMap();
+				Map<String, Object> row = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; i++) {
 					Object v = rs.getObject(i);
 					v = binary2String(v, charset);
@@ -238,7 +272,7 @@ public abstract class SqlTxUtil {
 		}
 		return rowList;
 	}
-	
+
 	/**
 	 * @author guweichao 20170511 将查询结果全部使用String封装(blob字段使用utf-8解析为string) null
 	 *         会转为""
@@ -246,9 +280,9 @@ public abstract class SqlTxUtil {
 	 * @param obj
 	 * @return
 	 */
-	public List<Map<String, String>> queryStringList(String charset,String sql, Object... obj) {
+	public List<Map<String, String>> queryStringList(String charset, String sql, Object... obj) {
 		getTxConn();
-		List<Map<String, String>> list = ListUtil.newArrayList();
+		List<Map<String, String>> list = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -258,7 +292,7 @@ public abstract class SqlTxUtil {
 			ResultSetMetaData rsmd = rs.getMetaData();
 			int columnCount = rsmd.getColumnCount();
 			while (rs.next()) {
-				Map<String, String> rsMap = MapUtil.newHashMap();
+				Map<String, String> rsMap = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; ++i) {
 					Object v = rs.getObject(i);
 					v = binary2String(v, charset);
@@ -273,12 +307,12 @@ public abstract class SqlTxUtil {
 		}
 		return list;
 	}
-	
+
 	public Map<String, Object> query(String sql, Object... obj) {
 		getTxConn();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
-		Map<String, Object> rsMap = MapUtil.newHashMap();
+		Map<String, Object> rsMap = Containers.newHashMap();
 		try {
 			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
@@ -297,7 +331,7 @@ public abstract class SqlTxUtil {
 		}
 		return rsMap;
 	}
-	
+
 	/**
 	 * @param sql
 	 *            查询两个字段分别作为作为key和value成为map 如果查询字段数不为2 则返回空map
@@ -305,7 +339,7 @@ public abstract class SqlTxUtil {
 	 */
 	public Map<String, String> mapQuery(String sql, Object... obj) {
 		getTxConn();
-		Map<String, String> rsMap = MapUtil.newHashMap();
+		Map<String, String> rsMap = Containers.newHashMap();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
@@ -328,15 +362,15 @@ public abstract class SqlTxUtil {
 		}
 		return rsMap;
 	}
-	
+
 	/**
 	 * 查询单字段,直接装入list
+	 * 
 	 * @param sql
 	 * @param objects
 	 * @return
 	 */
-	public List<Object> getOneColumnList(String sql, Object... obj) {
-		List<Object> list = ListUtil.newArrayList();
+	public Collection<Object> getOneColumn(Collection<Object> coll, String sql, Object... obj) {
 		getTxConn();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -346,7 +380,7 @@ public abstract class SqlTxUtil {
 			rs = pstmt.executeQuery();
 			if (rs != null) {
 				while (rs.next()) {
-					list.add(rs.getObject(1));
+					coll.add(rs.getObject(1));
 				}
 			}
 		} catch (SQLException e) {
@@ -354,17 +388,18 @@ public abstract class SqlTxUtil {
 		} finally {
 			closeAll(pstmt, rs);
 		}
-		return list;
+		return coll;
 	}
-	
+
 	/**
 	 * 查询单字段,直接装入Set
+	 * 
 	 * @param sql
 	 * @param objects
 	 * @return
 	 */
 	public Set<String> getStringSet(String sql, Object... obj) {
-		Set<String> set = SetUtil.newHashSet();
+		Set<String> set = Containers.newHashSet();
 		getTxConn();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -374,7 +409,7 @@ public abstract class SqlTxUtil {
 			rs = pstmt.executeQuery();
 			if (rs != null) {
 				while (rs.next()) {
-					set.add(StringUtil.toString(binary2String(rs.getObject(1),"utf-8")));
+					set.add(StringUtil.toString(binary2String(rs.getObject(1), "utf-8")));
 				}
 			}
 		} catch (SQLException e) {
@@ -384,26 +419,26 @@ public abstract class SqlTxUtil {
 		}
 		return set;
 	}
-	
 
 	/**************************************************** private ***************************************************/
-	
-	private Object binary2String(Object o,String charset){
-		if(o != null){
-			if(o instanceof byte[]){
+
+	private Object binary2String(Object o, String charset) {
+		if (o != null) {
+			if (o instanceof byte[]) {
 				byte[] bs = (byte[]) o;
 				try {
-					o = new String(bs,charset);
+					o = new String(bs, charset);
 				} catch (UnsupportedEncodingException e) {
 					e.printStackTrace();
 				}
-			}else if(o instanceof Blob){
+			} else if (o instanceof Blob) {
 				o = StringUtil.blob2String((Blob) o, charset);
 			}
 		}
 		return o;
-		
+
 	}
+
 	private void setParams(PreparedStatement pst, Object... objs) {
 		for (int i = 0; i < objs.length; i++) {
 			Object o = objs[i];
@@ -424,6 +459,7 @@ public abstract class SqlTxUtil {
 	private void closeAll(Statement st, ResultSet rs) {
 		if (!tx && conn != null) {
 			try {
+				System.out.println("sql conn关闭,非事务");
 				conn.close();
 			} catch (Exception e) {
 			}
@@ -448,8 +484,10 @@ public abstract class SqlTxUtil {
 		if (tx) {
 			// 如果已开启事务,则从当前线程获取Connection
 			conn = txConns.get(thid);
+			System.out.println("sql事务开启,从线程获取conn");
 		} else {
-				conn = getConnection();
+			System.out.println("sql事务未开启,直接获取conn");
+			conn = getConnection();
 		}
 	}
 

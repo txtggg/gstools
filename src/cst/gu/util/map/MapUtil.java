@@ -5,8 +5,12 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import cst.gu.util.container.Containers;
+
 /**
  * @author guweichao 2017 1016
+ * @deprecated
+ * @see Containers
  */
 public class MapUtil {
 

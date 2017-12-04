@@ -3,9 +3,13 @@ package cst.gu.util.collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import cst.gu.util.container.Containers;
+
 
 /**
  * @author guweichao 2017 1016
+ * @deprecated
+ * @see Containers
  */
 public class SetUtil {
 

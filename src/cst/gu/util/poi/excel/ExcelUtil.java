@@ -22,11 +22,10 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
-import cst.gu.util.collection.ListUtil;
+import cst.gu.util.container.Containers;
 import cst.gu.util.datetime.LocalDateUtil;
 import cst.gu.util.exception.FileTypeException;
 import cst.gu.util.file.FileUtil;
-import cst.gu.util.map.MapUtil;
 import cst.gu.util.string.StringUtil;
 
 /**
@@ -112,7 +111,7 @@ public class ExcelUtil {
 		try{
 			wb = getWorkbook(in, xls);
 			int sheets = wb.getNumberOfSheets();
-			Map<String,List<List<String>>> excel = MapUtil.newHashMapWithSize(sheets);
+			Map<String,List<List<String>>> excel = Containers.newHashMap(sheets);
 			for (int x = 0; x < sheets; x++) {
 				Sheet sheet = wb.getSheetAt(x);
 				excel.put(sheet.getSheetName(), getSheetInfo(sheet));
@@ -328,8 +327,6 @@ public class ExcelUtil {
 	 * 导出数据到第一个sheet
 	 * @param template
 	 *            excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param xls
 	 *            excel文件格式,true:*.xls|false:xlsx
 	 * @param infos
@@ -338,15 +335,13 @@ public class ExcelUtil {
 	 * @return
 	 */
 	public static byte[] templateExport(InputStream template, boolean xls, Map<String, Object> infos) {
-		List<Map<String,Object>> list = ListUtil.newArrayListWithSize(1);
+		List<Map<String,Object>> list = Containers.newArrayListSize(1);
 		list.add(infos);
 		return templateExport(template,xls ,list);
 	}
 	/**
 	 * @param template
-	 *           excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
+	 *            excel模板
 	 * @param xls
 	 *            excel文件格式,true:*.xls|false:xlsx
 	 * @param infos
@@ -377,7 +372,7 @@ public class ExcelUtil {
 					if (row != null) {
 						int cols = row.getLastCellNum();
 						String mkey = null;
-						Map<Integer, String> cmap = MapUtil.newHashMap();
+						Map<Integer, String> cmap = Containers.newHashMap();
 						for (int y = 0; y < cols; y++) {
 							Cell cell = row.getCell(y);
 							if (cell != null) {
@@ -413,7 +408,7 @@ public class ExcelUtil {
 						if (mkey != null) {
 							@SuppressWarnings("unchecked")
 							List<Map<String, Object>> rowsInfo = (List<Map<String, Object>>) m0.get(mkey);
-							if (!ListUtil.isEmpty(rowsInfo)) {
+							if (!Containers.isEmpty(rowsInfo)) {
 								for (int r = 0, s = rowsInfo.size(); r < s; r++) {
 									Map<String, Object> rowMap = rowsInfo.get(r);
 									Set<Entry<Integer, String>> entrys = cmap.entrySet();
@@ -489,15 +484,13 @@ public class ExcelUtil {
 	/**
 	 * 导出数据到第一个sheet
 	 * @param template
-	 *          excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
+	 *            excel模板
 	 * @param infos
 	 *           sheet1的信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
 	 */
 	public static byte[] templateExport(File template,Map<String, Object> infos) {
-		List<Map<String,Object>> list = ListUtil.newArrayListWithSize(1);
+		List<Map<String,Object>> list = Containers.newArrayListSize(1);
 		list.add(infos);
 		return templateExport(template, list);
 	}
@@ -505,8 +498,6 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            根据index分别存储对应sheet的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
@@ -539,8 +530,6 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            sheet1的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存
@@ -552,8 +541,6 @@ public class ExcelUtil {
 	/**
 	 * @param template
 	 *            excel模板
-	 *            使用excel(.xls 或 .xlsx)文件作为模板,导出内容,如果是标题等只出现一次的内容,使用${key},从infos中获取key对应的填充内容,
-	 *            如果是多行的数据列,使用${a.b},从infos中获取a对应的list<Map<String,Object>>, 循环list,每个map对应一行内容,以b为key,填充内容
 	 * @param infos
 	 *            根据index分别存储对应sheet的标记信息 注意模板最后一行如果是${a.b}
 	 *            则需要在最后一行的下一行输入一个空格,留作复制行的缓存

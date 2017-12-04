@@ -5,7 +5,9 @@ import java.util.List;
 
 /**
  * @author guweichao 2017 1016
+ * @see Containers
  */
+@Deprecated
 public class ListUtil { 
 	
 	public static <E> boolean isEmpty(List<E> list){
@@ -33,5 +35,10 @@ public class ListUtil {
 		return list;
 	}
 	
-	
+	public static <T> T tryGet(List<T> list,int index){
+		if(list!= null && list.size() > index){
+			return list.get(index);
+		}
+		return null;
+	}
 }
