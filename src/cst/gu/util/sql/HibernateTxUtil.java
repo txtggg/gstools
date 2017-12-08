@@ -60,10 +60,6 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		session = getSession();
 		session.beginTransaction();
 		super.beginTx();
-		System.out.println("hibernate事务开启------------------------>");
-		System.out.println(thid);
-		System.out.println(txSessions);
-		System.out.println(session);
 		tx = true;
 
 		return this;
@@ -100,10 +96,6 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		txSessions.remove(thid);
 		super.endTx();
 		tx = false;
-		System.out.println("hibernate事务结束------------------------>");
-		System.out.println(thid);
-		System.out.println(txSessions);
-		System.out.println(session);
 		return this;
 	}
 
@@ -196,10 +188,8 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 
 	private void getTxSession() {
 		if (tx) {
-			System.out.println("事务已开启,从线程中中获取session");
 			session = txSessions.get(thid);
 		} else {
-			System.out.println("事务已开启,直接获取session");
 			session = getSession();
 		}
 	}
@@ -207,7 +197,6 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	private void closeSession() {
 		if (!tx) {
 			if (session != null && session.isOpen()) {
-				System.out.println("非事务,关闭session");
 				session.flush();
 				session.close();
 			}

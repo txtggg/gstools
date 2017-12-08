@@ -1,6 +1,9 @@
 package cst.gu.util.sql.test;
 
+import java.math.BigInteger;
 import java.util.Map;
+
+import sun.security.util.BigInt;
 
 
 
@@ -11,8 +14,11 @@ import java.util.Map;
 public class MainTest {
 	static String charset = "utf-8";
 	public static void main(String[] args) {
-		System.out.println(Integer.MAX_VALUE );
-		System.out.println(Integer.MAX_VALUE + Integer.MAX_VALUE);
+		BigInt bi = new BigInt(1);
+		for(int x = 0;x < 100000;x++){
+		}
+		System.out.println(bi);
+		
 	}
 	protected void doPost(Map<String,String> map)   {
 		String amount = map.get("creditAmount");

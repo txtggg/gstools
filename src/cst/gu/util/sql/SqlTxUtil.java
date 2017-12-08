@@ -59,10 +59,6 @@ public abstract class SqlTxUtil {
 			throw new RuntimeException(e);
 		}
 		tx = true;
-		System.out.println("sql 事务 开启------------------------>");
-		System.out.println(conn);
-		System.out.println(txConns);
-		System.out.println(thid);
 		return this;
 	}
 
@@ -108,10 +104,6 @@ public abstract class SqlTxUtil {
 			throw new RuntimeException(e);
 		}
 		tx = false;
-		System.out.println("sql 事务 结束------------------------>");
-		System.out.println(conn);
-		System.out.println(txConns);
-		System.out.println(thid);
 		return this;
 	}
 
@@ -443,7 +435,6 @@ public abstract class SqlTxUtil {
 		for (int i = 0; i < objs.length; i++) {
 			Object o = objs[i];
 			try {
-				System.out.println(o);
 				if (o == null) {
 					pst.setNull(i + 1, java.sql.Types.NUMERIC);
 				} else {
@@ -459,7 +450,6 @@ public abstract class SqlTxUtil {
 	private void closeAll(Statement st, ResultSet rs) {
 		if (!tx && conn != null) {
 			try {
-				System.out.println("sql conn关闭,非事务");
 				conn.close();
 			} catch (Exception e) {
 			}
@@ -484,9 +474,7 @@ public abstract class SqlTxUtil {
 		if (tx) {
 			// 如果已开启事务,则从当前线程获取Connection
 			conn = txConns.get(thid);
-			System.out.println("sql事务开启,从线程获取conn");
 		} else {
-			System.out.println("sql事务未开启,直接获取conn");
 			conn = getConnection();
 		}
 	}

@@ -2,6 +2,8 @@ package cst.gu.util.map;
 
 import java.util.HashMap;
 
+import cst.gu.util.container.Containers;
+
 /**
  * @author guweichao 2017 1103 双向map,互为key value
  * 非线程安全
@@ -24,7 +26,7 @@ public class BothwayMap<K1, K2> {
 	 */
 	@SuppressWarnings("unchecked")
 	public HashMap<K1,K2> toHashMap1(){
-		HashMap<K1,K2> m = MapUtil.newHashMapWithSize(size);
+		HashMap<K1,K2> m =  Containers.newHashMap(size);
 		for(int x =0 ;x < size;x++){
 			m.put((K1)k1Array[x], (K2)k2Array[x]);
 		}
@@ -38,7 +40,7 @@ public class BothwayMap<K1, K2> {
 	 */
 	@SuppressWarnings("unchecked")
 	public HashMap<K2,K1> toHashMap2(){
-		HashMap<K2,K1> m = MapUtil.newHashMapWithSize(size);
+		HashMap<K2,K1> m = Containers.newHashMap(size);
 		for(int x =0 ;x < size;x++){
 			m.put((K2)k2Array[x], (K1)k1Array[x]);
 		}
