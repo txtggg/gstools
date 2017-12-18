@@ -27,6 +27,18 @@ public class Containers {
 	public static <T> boolean isEmpty(Set<T> set) {
 		return set == null || set.isEmpty();
 	}
+	
+	public static <V, K> boolean isNotEmpty(Map<K, V> map) {
+		return !isEmpty(map);
+	}
+
+	public static <E> boolean isNotEmpty(List<E> list) {
+		return !isEmpty(list);
+	}
+
+	public static <T> boolean isNotEmpty(Set<T> set) {
+		return !isEmpty(set);
+	}
 
 	/**
 	 * 指定初始大小,创建arraylist
