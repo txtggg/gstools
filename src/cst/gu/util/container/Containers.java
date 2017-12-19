@@ -100,6 +100,17 @@ public class Containers {
 	public static <K, V> HashMap<K, V> newHashMap() {
 		return new HashMap<K, V>();
 	}
+	
+	/**
+	 * 新建一个hashmap并复制指定的map内容
+	 * @param map
+	 * @return
+	 */
+	public static <K, V> HashMap<K, V> newHashMap(Map<K,V> map) {
+		HashMap<K,V> nmap = new HashMap<K, V>();
+		nmap.putAll(map);
+		return nmap;
+	}
 
 	public static <K, V> HashMap<K, V> newHashMap(int initSize) {
 		return new HashMap<K, V>(initSize);

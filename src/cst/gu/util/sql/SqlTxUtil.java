@@ -138,10 +138,10 @@ public abstract class SqlTxUtil {
 	 * @param o
 	 * @return
 	 */
-	public int updateBean(Object o) {
+	public void updateBean(IBean o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.update();
-		return update(mk.getSql(), mk.getParams());
+		update(mk.getSql(), mk.getParams());
 	}
 
 	/**
@@ -150,7 +150,7 @@ public abstract class SqlTxUtil {
 	 * @param o
 	 * @return
 	 */
-	public int deleteBean(Object o) {
+	public int deleteBean(IBean o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.delete();
 		return update(mk.getSql(), mk.getParams());
@@ -193,7 +193,7 @@ public abstract class SqlTxUtil {
 	 * @param o
 	 * @return
 	 */
-	public int insertBean(Object o) {
+	public int insertBean(IBean o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.insert();
 		return insert(mk.getSql(), mk.getParams());
@@ -204,7 +204,7 @@ public abstract class SqlTxUtil {
 	 * 
 	 * @param t
 	 */
-	public void getBean(Object bean) {
+	public void getBean(IBean bean) {
 		SqlMaker mk = new MysqlMaker(bean);
 		mk.select();
 		Map<String, Object> m = query(mk.getSql(), mk.getParams());

@@ -3,6 +3,8 @@ package cst.gu.util.sql.test;
 import java.math.BigInteger;
 import java.util.Map;
 
+import cst.gu.util.sql.SqlMaker;
+import cst.gu.util.sql.impl.MysqlMaker;
 import sun.security.util.BigInt;
 
 
@@ -14,10 +16,6 @@ import sun.security.util.BigInt;
 public class MainTest {
 	static String charset = "utf-8";
 	public static void main(String[] args) {
-		BigInt bi = new BigInt(1);
-		for(int x = 0;x < 100000;x++){
-		}
-		System.out.println(bi);
 		
 	}
 	protected void doPost(Map<String,String> map)   {
