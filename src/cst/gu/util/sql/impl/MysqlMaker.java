@@ -35,6 +35,32 @@ public class MysqlMaker implements SqlMaker {
 	
 
 	/**
+	 * 使用调试模式启动时eclipse时,bean重新加载但是map中还是缓存内容,因此需要清理对应的缓存
+	 * @param bean
+	 */
+	public static void resetBean(Object bean){
+		Class<?> clz = bean.getClass();
+		String clzName = clz.getName();
+		fieldsMap.remove(clzName);
+		pkMap.remove(clzName);
+		sqlMap.remove(clzName + ":insert:" + true);
+		sqlMap.remove(clzName + ":insert:" + false);
+		sqlMap.remove(clzName + ":delete");
+		sqlMap.remove(clzName + ":update");
+		sqlMap.remove(clzName + ":select");
+	}
+	
+	/**
+	 * 使用调试模式启动时eclipse时,bean重新加载但是map中还是缓存内容,可清楚缓存
+	 * 本方法会清楚全部缓存
+	 * @param bean
+	 */
+	public static void resetAll(){
+		fieldsMap.clear();
+		pkMap.clear();
+		sqlMap.clear();
+	}
+	/**
 	 * 
 	 * @param bean 含有数据库表结构注解(@Table @Column @PrimaryKey)和数据信息的bean对象
 	 * @param insertPK 执行插入语句时是否带有主键(如果主键自增,应设置false,数据库自动使用自增主键)

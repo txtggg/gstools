@@ -356,7 +356,7 @@ public abstract class SqlTxUtil {
 	}
 
 	/**
-	 * 查询单字段,直接装入list
+	 * 查询单字段,直接装入list 或set
 	 * 
 	 * @param sql
 	 * @param objects
