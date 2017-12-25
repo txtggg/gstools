@@ -59,13 +59,14 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		}
 		session = getSession();
 		session.beginTransaction();
+		txSessions.put(thid, session);
 		super.beginTx();
 		tx = true;
 
 		return this;
 	}
 
-	public HibernateTxUtil rollBack() {
+	public synchronized HibernateTxUtil rollBack() {
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
@@ -74,7 +75,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		return this;
 	}
 
-	public HibernateTxUtil commitChange() {
+	public synchronized HibernateTxUtil commitChange() {
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
@@ -88,11 +89,13 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	 * 
 	 * @return
 	 */
-	public HibernateTxUtil endTx() {
+	public synchronized HibernateTxUtil endTx() {
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
-		session.close();
+		if(session != null){
+			session.close();
+		}
 		txSessions.remove(thid);
 		super.endTx();
 		tx = false;

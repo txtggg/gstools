@@ -62,7 +62,7 @@ public abstract class SqlTxUtil {
 		return this;
 	}
 
-	public SqlTxUtil rollBack() {
+	public synchronized SqlTxUtil rollBack() {
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
@@ -74,7 +74,7 @@ public abstract class SqlTxUtil {
 		return this;
 	}
 
-	public SqlTxUtil commitChange() {
+	public synchronized SqlTxUtil commitChange() {
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
 		}
@@ -91,7 +91,7 @@ public abstract class SqlTxUtil {
 	 * 
 	 * @return
 	 */
-	public SqlTxUtil endTx() {
+	public synchronized SqlTxUtil endTx() {
 
 		if (!tx) {
 			throw new RuntimeException("事务尚未开启");
@@ -191,7 +191,7 @@ public abstract class SqlTxUtil {
 	 * 根据bean执行单表的删除  生成sql,通过jdbc进行执行
 	 * 执行后并不会自动赋值bean对象,需要手动处理
 	 * @param o
-	 * @return
+	 * @return 新插入语句的主键id
 	 */
 	public int insertBean(IBean o) {
 		SqlMaker mk = new MysqlMaker(o);
