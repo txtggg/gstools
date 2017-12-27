@@ -16,11 +16,8 @@ import sun.security.util.BigInt;
  * 
  */
 public class MainTest {
-	static String charset = "utf-8";
-	public static void main(String[] args) throws UnsupportedEncodingException {
-		String ddd = FileUtil.getFileContent("D:\\gu\\Desktop\\cb\\m1.txt");
-		String m2 = new String(ddd.getBytes(),"gbk");
-		System.out.println(m2);
+	public static void main(String[] args) {
+		Ser1 s = Ser1.getSer1();
+		s.say("guiwei");
 	}
-	 
 }
