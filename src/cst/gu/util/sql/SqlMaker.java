@@ -13,4 +13,6 @@ public interface SqlMaker {
 	void select();
 	String getSql();
 	Object[] getParams();
+	String getColumnNames();
+	String getFieldNames();
 }

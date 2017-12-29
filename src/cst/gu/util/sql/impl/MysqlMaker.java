@@ -224,10 +224,10 @@ public class MysqlMaker implements SqlMaker {
 			for(int x =0;x<fs.length;x++){
 				Field f = fs[x];
 				if(!f.getType().getName().equals("java.util.Set")){
+					f.setAccessible(true);
 					if(AnnoUtil.isPrimaryKey(f)){
 						pkf = f;
 					}else{
-						f.setAccessible(true);
 						flist.add(f);
 					}
 				}
@@ -236,12 +236,32 @@ public class MysqlMaker implements SqlMaker {
 				pkf = fs[0];
 				flist.remove(0);
 			}
-			pkf.setAccessible(true);
 			fields = flist.toArray(new Field[flist.size()]);
 			pkMap.put(clzName, pkf);
 			fieldsMap.put(clzName, fields);
 		}
 	}
 	
+	/**
+	 * 获取字段对应的数据库名称,用于输出自动生成语句,以便直接调试sql
+	 */
+	public String getColumnNames(){
+		StringBuilder names = new StringBuilder(AnnoBeanUtil.getColumn(pkf));
+		for(Field f : fields){
+			names.append(",").append(AnnoBeanUtil.getColumn(f));
+		}
+		return names.toString();
+	}
+	
+	/**
+	 * 获取字段名称,用于输出自动生成语句,以便直接调试sql
+	 */
+	public String getFieldNames(){
+		StringBuilder names = new StringBuilder(AnnoBeanUtil.getColumn(pkf));
+		for(Field f : fields){
+			names.append(",").append(AnnoBeanUtil.getColumn(f));
+		}
+		return names.toString();
+	}
 	 
 }

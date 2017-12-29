@@ -1,13 +1,10 @@
 package cst.gu.util.sql.test;
 
-import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.util.Map;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
-import cst.gu.util.file.FileUtil;
-import cst.gu.util.sql.SqlMaker;
-import cst.gu.util.sql.impl.MysqlMaker;
-import sun.security.util.BigInt;
+import cst.gu.util.sql.SqlTxUtil;
 
 
 
@@ -16,8 +13,24 @@ import sun.security.util.BigInt;
  * 
  */
 public class MainTest {
+	private static SqlTxUtil db = new SqlTxUtil() {
+		
+		@Override
+		protected Connection getConnection() {
+			try {
+				Class.forName("com.mysql.jdbc.Driver");
+				return DriverManager.getConnection("jdbc:mysql://localhost/gutest?autoReconnect=true&amp;zeroDateTimeBehavior=convertToNull&amp;characterEncoding=utf8&amp;useSSL=true","root","123456");
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}catch (SQLException e) {
+				// TODO 自动生成的 catch 块
+				e.printStackTrace();
+			}
+			return null;
+			
+		}
+	};
 	public static void main(String[] args) {
-		Ser1 s = Ser1.getSer1();
-		s.say("guiwei");
+		System.out.println(db.update("delete t1.*,t2.* from t_bug t1,t_bugfj t2 where t1.bug_id = t2.bug_id and t1.bug_id = 11"));
 	}
 }
