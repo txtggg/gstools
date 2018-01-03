@@ -41,7 +41,7 @@ public final class LocalDateUtil {
 		}
 		return d;
 	}
-                                                                                       
+	
 	/**
 	 * @author guweichao 20170524
 	 * 使用SimpleDateFormat 格式化时间 
@@ -332,6 +332,25 @@ public final class LocalDateUtil {
 	@SuppressWarnings("deprecation")
 	public static int getQuarter(Date date){
 		return date.getMonth()/3 + 1;
+	}
+	
+	/**
+	 * 获取今天的字符串格式
+	 * yyyy-MM-dd HH:mm:ss
+	 * @return
+	 */
+	public static String getToday(){
+		return simpleFormatDay(new Date()) + " 00:00:00";
+	}
+	
+
+	/**
+	 * 获取当前时刻的字符串格式
+	 * yyyy-MM-dd HH:mm:ss
+	 * @return
+	 */
+	public static String getNow(){
+		return simpleFormatSecond(new Date());
 	}
 	
 	
