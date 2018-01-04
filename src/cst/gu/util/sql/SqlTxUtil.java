@@ -23,51 +23,26 @@ import cst.gu.util.string.StringUtil;
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
  */
 public abstract class SqlTxUtil {
-	private Long thid = null;
-	private static Map<Long, Connection> txConns = Containers.newHashMap();
-	private boolean tx = false;
-	private Connection conn;
+	private static final ThreadLocal<Connection> thconns = new ThreadLocal<Connection>();
+	private static final ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
 
 	protected abstract Connection getConnection();
-
-	public SqlTxUtil() {
-		thid = Thread.currentThread().getId();
-		if (txConns.containsKey(thid)) {
-			tx = true;
-		}
-	}
-
 	/**************************************************** transaction ***************************************************/
 	public synchronized SqlTxUtil beginTx() {
-
-		if (tx) {
-			throw new RuntimeException("事务已经开启");
+		
+		if (getThtx()) {
+			System.out.println("事务已经开启");
 		}
-		try {
-			conn = getConnection();
-			conn.setAutoCommit(false);
-			thid = Thread.currentThread().getId();
-			txConns.put(thid, conn); // 将连接放入线程id为key的map中待用
-		} catch (SQLException e) {
-			if (conn != null) {
-				try {
-					conn.close();
-				} catch (SQLException e1) {
-					e1.printStackTrace();
-				}
-			}
-			throw new RuntimeException(e);
-		}
-		tx = true;
+		thtx.set(true);
 		return this;
 	}
 
 	public synchronized SqlTxUtil rollBack() {
-		if (!tx) {
+		if (!getThtx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
 		try {
-			conn.rollback();
+			getTxConn().rollback();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -75,11 +50,11 @@ public abstract class SqlTxUtil {
 	}
 
 	public synchronized SqlTxUtil commitChange() {
-		if (!tx) {
+		if (!getThtx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
 		try {
-			conn.commit();
+			getTxConn().commit();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -92,18 +67,16 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public synchronized SqlTxUtil endTx() {
-
-		if (!tx) {
+		if (!getThtx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
 		try {
+			Connection conn = getTxConn();
 			conn.setAutoCommit(false);
 			conn.close();
-			txConns.remove(thid);
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		tx = false;
 		return this;
 	}
 
@@ -117,11 +90,11 @@ public abstract class SqlTxUtil {
 	 * @return 执行结果影响的行数 返回 -1 表示执行有问题(发生异常会抛出运行时异常)
 	 */
 	public int update(String sql, Object... obj) {
-		getTxConn();
+		
 		PreparedStatement pstmt = null;
 		int count = -1;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			count = pstmt.executeUpdate();
 		} catch (Exception e) {
@@ -170,8 +143,8 @@ public abstract class SqlTxUtil {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
 		try {
-			getTxConn();
-			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			
+			pst = getTxConn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			setParams(pst, obj);
 			pst.executeUpdate();
 			int id = 0;
@@ -212,12 +185,12 @@ public abstract class SqlTxUtil {
 	}
 
 	public List<Map<String, Object>> queryList(String sql, Object... objs) {
-		getTxConn();
+		
 		List<Map<String, Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, objs);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -238,12 +211,12 @@ public abstract class SqlTxUtil {
 	}
 
 	public List<Map<String, Object>> queryListWithBlob(String charset, String sql, Object... obj) {
-		getTxConn();
+		
 		List<Map<String,Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -273,12 +246,12 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public List<Map<String, String>> queryStringList(String charset, String sql, Object... obj) {
-		getTxConn();
+		
 		List<Map<String, String>> list = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -301,12 +274,12 @@ public abstract class SqlTxUtil {
 	}
 
 	public Map<String, Object> query(String sql, Object... obj) {
-		getTxConn();
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		Map<String, Object> rsMap = Containers.newHashMap();
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null && rs.next()) {
@@ -330,12 +303,12 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public Map<String, String> mapQuery(String sql, Object... obj) {
-		getTxConn();
+		
 		Map<String, String> rsMap = Containers.newHashMap();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -363,11 +336,11 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public Collection<Object> getOneColumn(Collection<Object> coll, String sql, Object... obj) {
-		getTxConn();
+		
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -392,11 +365,10 @@ public abstract class SqlTxUtil {
 	 */
 	public Set<String> getStringSet(String sql, Object... obj) {
 		Set<String> set = Containers.newHashSet();
-		getTxConn();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		try {
-			pstmt = conn.prepareStatement(sql);
+			pstmt = getTxConn().prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -448,10 +420,14 @@ public abstract class SqlTxUtil {
 	}
 
 	private void closeAll(Statement st, ResultSet rs) {
-		if (!tx && conn != null) {
+		if (!getThtx()) {
 			try {
-				conn.close();
+				Connection conn = getTxConn();
+				if (conn != null && !getTxConn().isClosed()) {
+					getTxConn().close();
+				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
 
@@ -470,13 +446,34 @@ public abstract class SqlTxUtil {
 		}
 	}
 
-	private void getTxConn() {
-		if (tx) {
+	private Connection getTxConn() {
+		if (getThtx()) {
 			// 如果已开启事务,则从当前线程获取Connection
-			conn = txConns.get(thid);
+			Connection conn = thconns.get();
+			if(conn == null){
+				try{
+					conn = getConnection();
+					getTxConn().setAutoCommit(false);
+				}catch(SQLException e){
+					e.printStackTrace();
+				}
+			}
+			return conn;
 		} else {
-			conn = getConnection();
+			return getConnection();
 		}
+	}
+	
+	/**
+	 * 本线程是否开启事务
+	 * @return
+	 */
+	private boolean getThtx(){
+		Boolean tx = thtx.get();
+		if(tx == null){
+			return false;
+		}
+		return tx.booleanValue();
 	}
 
 }
