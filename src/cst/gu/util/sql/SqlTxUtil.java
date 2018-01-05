@@ -184,7 +184,7 @@ public abstract class SqlTxUtil {
 		SqlMaker mk = new MysqlMaker(bean);
 		mk.select();
 		Map<String, Object> m = query(mk.getSql(), mk.getParams());
-		BeanUtil.fillValueWithAnnotation(bean, query(mk.getSql(), m));
+		BeanUtil.fillValueWithAnnotation(bean, m);
 	}
 
 	public List<Map<String, Object>> queryList(String sql, Object... objs) {
