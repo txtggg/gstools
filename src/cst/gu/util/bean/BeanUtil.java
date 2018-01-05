@@ -94,15 +94,17 @@ public final class BeanUtil {
 				} else {
 					fieldName = anno;
 				}
-				Object v = map.get(fieldName);
-				if (v == null){
-					continue;}
-				String type = field.getType().getName();
-				// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
-				if (!type.equals(v.getClass().getName())) {
-					v = StringUtil.string2ObjectWithAnno(field.getType(), v.toString());
+				if (map.containsKey(fieldName)) {
+					Object v = map.get(fieldName);
+					if (v != null) {
+						String type = field.getType().getName();
+						// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
+						if (!type.equals(v.getClass().getName())) {
+							v = StringUtil.string2ObjectWithAnno(field.getType(), v.toString());
+						}
+					}
+					field.set(bean, v);
 				}
-				field.set(bean, v);
 			} catch (Exception e) {
 			}
 		}
@@ -125,15 +127,18 @@ public final class BeanUtil {
 			try { // 本方法中传入bean,不会出现IllegalArgumentException ;
 					// field.setAccessible(true),不会出现IllegalAccessException
 				String fieldName = field.getName();
-				Object v = map.get(fieldName);
-				if (v == null){
-					continue;}
-				String type = field.getType().getName();
-				// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
-				if (!type.equals(v.getClass().getName())) {
-					v = StringUtil.string2Object(field.getType(), v.toString());
+				if(map.containsKey(fieldName)){
+					Object v = map.get(fieldName);
+					
+					if (v != null) {
+						String type = field.getType().getName();
+						// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
+						if (!type.equals(v.getClass().getName())) {
+							v = StringUtil.string2Object(field.getType(), v.toString());
+						}
+					}
+					field.set(bean, v);
 				}
-				field.set(bean, v);
 			} catch (Exception e) {
 			}
 		}
