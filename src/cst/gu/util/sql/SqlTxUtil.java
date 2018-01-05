@@ -27,9 +27,10 @@ public abstract class SqlTxUtil {
 	private static final ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
 
 	protected abstract Connection getConnection();
+
 	/**************************************************** transaction ***************************************************/
 	public synchronized SqlTxUtil beginTx() {
-		
+
 		if (getThtx()) {
 			System.out.println("事务已经开启");
 		}
@@ -77,6 +78,8 @@ public abstract class SqlTxUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		thtx.remove();
+		thconns.remove();
 		return this;
 	}
 
@@ -90,24 +93,24 @@ public abstract class SqlTxUtil {
 	 * @return 执行结果影响的行数 返回 -1 表示执行有问题(发生异常会抛出运行时异常)
 	 */
 	public int update(String sql, Object... obj) {
-		
 		PreparedStatement pstmt = null;
 		int count = -1;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			count = pstmt.executeUpdate();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, null);
+			closeAll(conn, pstmt, null);
 		}
 		return count;
 	}
 
 	/**
-	 * 根据bean执行单表的更新 
-	 * 生成sql,通过jdbc进行执行
+	 * 根据bean执行单表的更新 生成sql,通过jdbc进行执行
+	 * 
 	 * @param o
 	 * @return
 	 */
@@ -118,8 +121,8 @@ public abstract class SqlTxUtil {
 	}
 
 	/**
-	 * 根据bean执行单表的删除 
-	 * 生成sql,通过jdbc进行执行
+	 * 根据bean执行单表的删除 生成sql,通过jdbc进行执行
+	 * 
 	 * @param o
 	 * @return
 	 */
@@ -142,9 +145,9 @@ public abstract class SqlTxUtil {
 	public int insert(String sql, Object... obj) {
 		PreparedStatement pst = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			
-			pst = getTxConn().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+			pst = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			setParams(pst, obj);
 			pst.executeUpdate();
 			int id = 0;
@@ -156,13 +159,13 @@ public abstract class SqlTxUtil {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pst, rs);
+			closeAll(conn, pst, rs);
 		}
 	}
 
 	/**
-	 * 根据bean执行单表的删除  生成sql,通过jdbc进行执行
-	 * 执行后并不会自动赋值bean对象,需要手动处理
+	 * 根据bean执行单表的删除 生成sql,通过jdbc进行执行 执行后并不会自动赋值bean对象,需要手动处理
+	 * 
 	 * @param o
 	 * @return 新插入语句的主键id
 	 */
@@ -173,7 +176,7 @@ public abstract class SqlTxUtil {
 	}
 
 	/**
-	 * 根据传入的bean,查询sql,并将数据插入对象中,生成sql,通过jdbc进行执行
+	 * 根据传入的bean,查询sql,并将数据插入对象中,生成sql,通过jdbc进行执行 bean对象需要id的值来获取数据
 	 * 
 	 * @param t
 	 */
@@ -185,12 +188,13 @@ public abstract class SqlTxUtil {
 	}
 
 	public List<Map<String, Object>> queryList(String sql, Object... objs) {
-		
+
 		List<Map<String, Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, objs);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -205,18 +209,19 @@ public abstract class SqlTxUtil {
 		} catch (SQLException sqlex) {
 			throw new RuntimeException(sqlex);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return rowList;
 	}
 
 	public List<Map<String, Object>> queryListWithBlob(String charset, String sql, Object... obj) {
-		
-		List<Map<String,Object>> rowList = Containers.newArrayList();
+
+		List<Map<String, Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -233,7 +238,7 @@ public abstract class SqlTxUtil {
 		} catch (SQLException sqlex) {
 			throw new RuntimeException(sqlex);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return rowList;
 	}
@@ -246,12 +251,13 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public List<Map<String, String>> queryStringList(String charset, String sql, Object... obj) {
-		
+
 		List<Map<String, String>> list = Containers.newArrayList();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			ResultSetMetaData rsmd = rs.getMetaData();
@@ -268,18 +274,19 @@ public abstract class SqlTxUtil {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return list;
 	}
 
 	public Map<String, Object> query(String sql, Object... obj) {
-		
+
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
 		Map<String, Object> rsMap = Containers.newHashMap();
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null && rs.next()) {
@@ -292,7 +299,7 @@ public abstract class SqlTxUtil {
 		} catch (SQLException e) {
 			new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return rsMap;
 	}
@@ -303,12 +310,13 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public Map<String, String> mapQuery(String sql, Object... obj) {
-		
+
 		Map<String, String> rsMap = Containers.newHashMap();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -323,7 +331,7 @@ public abstract class SqlTxUtil {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return rsMap;
 	}
@@ -336,11 +344,12 @@ public abstract class SqlTxUtil {
 	 * @return
 	 */
 	public Collection<Object> getOneColumn(Collection<Object> coll, String sql, Object... obj) {
-		
+
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -351,7 +360,7 @@ public abstract class SqlTxUtil {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return coll;
 	}
@@ -367,8 +376,9 @@ public abstract class SqlTxUtil {
 		Set<String> set = Containers.newHashSet();
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
+		Connection conn = getTxConn();
 		try {
-			pstmt = getTxConn().prepareStatement(sql);
+			pstmt = conn.prepareStatement(sql);
 			setParams(pstmt, obj);
 			rs = pstmt.executeQuery();
 			if (rs != null) {
@@ -379,7 +389,7 @@ public abstract class SqlTxUtil {
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
 		} finally {
-			closeAll(pstmt, rs);
+			closeAll(conn, pstmt, rs);
 		}
 		return set;
 	}
@@ -419,12 +429,11 @@ public abstract class SqlTxUtil {
 		}
 	}
 
-	private void closeAll(Statement st, ResultSet rs) {
+	private void closeAll(Connection conn, Statement st, ResultSet rs) {
 		if (!getThtx()) {
 			try {
-				Connection conn = getTxConn();
 				if (conn != null && !getTxConn().isClosed()) {
-					getTxConn().close();
+					conn.close();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -450,27 +459,29 @@ public abstract class SqlTxUtil {
 		if (getThtx()) {
 			// 如果已开启事务,则从当前线程获取Connection
 			Connection conn = thconns.get();
-			if(conn == null){
-				try{
+			if (conn == null) {
+				try {
 					conn = getConnection();
-					getTxConn().setAutoCommit(false);
-				}catch(SQLException e){
+					conn.setAutoCommit(false);
+				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
+			thconns.set(conn);
 			return conn;
 		} else {
 			return getConnection();
 		}
 	}
-	
+
 	/**
 	 * 本线程是否开启事务
+	 * 
 	 * @return
 	 */
-	private boolean getThtx(){
+	private boolean getThtx() {
 		Boolean tx = thtx.get();
-		if(tx == null){
+		if (tx == null) {
 			return false;
 		}
 		return tx.booleanValue();

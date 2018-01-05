@@ -3,14 +3,11 @@ package cst.gu.util.sql;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.engine.SessionFactoryImplementor;
-
-import cst.gu.util.container.Containers;
 
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
@@ -25,19 +22,11 @@ import cst.gu.util.container.Containers;
  */
 public abstract class HibernateTxUtil extends SqlTxUtil{
 	private static ConnectionProvider cp = null;
-	private Long thid = null;
-	private static Map<Long, Session> txSessions = Containers.newHashMap();
-
-	private boolean tx = false;
-	private Session session;
+	
+	private static ThreadLocal<Session> thse = new ThreadLocal<Session>();
+	private static ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
 
 	public abstract Session getSession();
-	public HibernateTxUtil() {
-		thid = Thread.currentThread().getId();
-		if (txSessions.containsKey(thid) ) {
-			tx = true;
-		}
-	}
 
 	@Override
 	protected  Connection getConnection(){
@@ -54,32 +43,28 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 
 	/**************************************************** transaction ***************************************************/
 	public synchronized HibernateTxUtil beginTx() {
-		if (tx) {
-			throw new RuntimeException("事务已经开启");
+		if (getTx()) {
+			System.out.println("事务已经开启");
 		}
-		session = getSession();
-		session.beginTransaction();
-		txSessions.put(thid, session);
+		thtx.set(true);
 		super.beginTx();
-		tx = true;
-
 		return this;
 	}
 
 	public synchronized HibernateTxUtil rollBack() {
-		if (!tx) {
+		if (!getTx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
-		session.getTransaction().rollback();
+		getTxSession().getTransaction().rollback();
 		super.rollBack();
 		return this;
 	}
 
 	public synchronized HibernateTxUtil commitChange() {
-		if (!tx) {
+		if (!getTx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
-		session.getTransaction().commit();
+		getTxSession().getTransaction().commit();
 		super.commitChange();
 		return this;
 	}
@@ -90,15 +75,14 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	 * @return
 	 */
 	public synchronized HibernateTxUtil endTx() {
-		if (!tx) {
+		if (!getTx()) {
 			throw new RuntimeException("事务尚未开启");
 		}
-		if(session != null){
-			session.close();
-		}
-		txSessions.remove(thid);
+		Session se = getTxSession();
+		thtx.remove();
+		thse.remove();
+		se.close();
 		super.endTx();
-		tx = false;
 		return this;
 	}
 
@@ -106,8 +90,8 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	/*********************************** hibernate ******************************************/
 
 	public int updateHql(String hql, Object... obj) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			Query q = session.createQuery(hql);
 			for (int i = 0; i < obj.length; i++) {
 				q.setParameter(i, obj[i]);
@@ -115,67 +99,67 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 			return q.executeUpdate();
 
 		} finally {
-			closeSession(); // 避免发生异常 session无法关闭
+			closeSession(session); // 避免发生异常 session无法关闭
 		}
 	}
 
 	public void saveOrUpdate(Object bean) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			session.saveOrUpdate(bean);
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
 	public void savePO(Object o) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			session.save(o);
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
 	public void updatePO(Object o) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			session.update(o);
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
 	public void deletePO(Object o) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			session.delete(o);
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
 	public <S> List<S> loadPOList(String hql, Object... obj) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			Query q = session.createQuery(hql);
 			for (int i = 0; i < obj.length; i++) {
 				q.setParameter(i, obj[i]);
 			}
 			return q.list();
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
 	@SuppressWarnings({ "unchecked" })
 	public <T> T loadPO(long pk, Class<T> clazz) {
+		Session session = getTxSession();
 		try {
-			getTxSession();
 			return (T) session.get(clazz, pk);
 		} finally {
-			closeSession();
+			closeSession(session);
 		}
 	}
 
@@ -189,16 +173,22 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	}
 
 
-	private void getTxSession() {
-		if (tx) {
-			session = txSessions.get(thid);
+	private Session getTxSession() {
+		if (getTx()) {
+			Session se = thse.get();
+			if(se == null){
+				se = getSession();
+				se.beginTransaction();
+			}
+			thse.set(se);
+			return se;
 		} else {
-			session = getSession();
+			return getSession();
 		}
 	}
 
-	private void closeSession() {
-		if (!tx) {
+	private void closeSession(Session session) {
+		if (!getTx()) {
 			if (session != null && session.isOpen()) {
 				session.flush();
 				session.close();
@@ -206,6 +196,14 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		} else {
 			// session.flush();
 		}
+	}
+	
+	private boolean getTx(){
+		Boolean tx = thtx.get();
+		if(tx == null){
+			return false;
+		}
+		return tx.booleanValue();
 	}
 
 }

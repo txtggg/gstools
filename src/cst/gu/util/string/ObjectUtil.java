@@ -72,7 +72,7 @@ public abstract class ObjectUtil {
 	
 	
 	/**
-	 * 转化Object为ong 如果无法转换 则返回null
+	 * 转化Object为Long 如果无法转换 则返回null
 	 * @return
 	 */
 	public static Long toLong(Object o){
