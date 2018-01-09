@@ -183,7 +183,7 @@ public abstract class ObjectUtil {
 	}
 	
 	private static void object2List(List<Object> list,Object objs){
-		if(objs.getClass().isArray()){
+		if(objs != null && objs.getClass().isArray()){
 			int len = Array.getLength(objs);
 			for(int x = 0; x < len;x++){
 				object2List(list,Array.get(objs, x));
