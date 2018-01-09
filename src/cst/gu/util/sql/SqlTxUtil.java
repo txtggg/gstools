@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
+
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
 import cst.gu.util.sql.impl.MysqlMaker;
@@ -25,7 +28,7 @@ import cst.gu.util.string.StringUtil;
 public abstract class SqlTxUtil {
 	private static final ThreadLocal<Connection> thconns = new ThreadLocal<Connection>();
 	private static final ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
-
+	private static Logger logger = Logger.getLogger(SqlTxUtil.class);
 	protected abstract Connection getConnection();
 
 	/**************************************************** transaction ***************************************************/
@@ -73,8 +76,8 @@ public abstract class SqlTxUtil {
 		}
 		try {
 			Connection conn = getTxConn();
-			conn.setAutoCommit(false);
 			conn.close();
+			logger.info("关闭Connection[事务] ...");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -430,15 +433,13 @@ public abstract class SqlTxUtil {
 	}
 
 	private void closeAll(Connection conn, Statement st, ResultSet rs) {
-		if (!getThtx()) {
+		if (st != null) {
 			try {
-				if (conn != null && !getTxConn().isClosed()) {
-					conn.close();
-				}
+				st.close();
 			} catch (Exception e) {
-				e.printStackTrace();
 			}
 		}
+		
 
 		if (rs != null) {
 			try {
@@ -446,13 +447,19 @@ public abstract class SqlTxUtil {
 			} catch (Exception e) {
 			}
 		}
-
-		if (st != null) {
+		
+		if (!getThtx()) {
 			try {
-				st.close();
+				if (conn != null && !conn.isClosed()) {
+					logger.info("关闭Connection ...");
+					conn.close();
+				}
 			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		}
+
+	
 	}
 
 	private Connection getTxConn() {
@@ -460,6 +467,7 @@ public abstract class SqlTxUtil {
 			// 如果已开启事务,则从当前线程获取Connection
 			Connection conn = thconns.get();
 			if (conn == null) {
+				logger.info("获取Connection[事务] ...");
 				try {
 					conn = getConnection();
 					conn.setAutoCommit(false);
@@ -470,6 +478,7 @@ public abstract class SqlTxUtil {
 			thconns.set(conn);
 			return conn;
 		} else {
+			logger.info("获取Connection ...");
 			return getConnection();
 		}
 	}

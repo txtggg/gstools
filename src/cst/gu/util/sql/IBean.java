@@ -1,3 +1,5 @@
 package cst.gu.util.sql;
 
-public interface IBean { }
+import java.io.Serializable;
+
+public interface IBean extends Serializable{ }

@@ -336,7 +336,7 @@ public final class LocalDateUtil {
 	
 	/**
 	 * 获取今天的字符串格式
-	 * yyyy-MM-dd HH:mm:ss
+	 * yyyy-MM-dd 00:00:00
 	 * @return
 	 */
 	public static String getToday(){
