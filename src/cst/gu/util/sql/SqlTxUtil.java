@@ -13,12 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
-
-
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
 import cst.gu.util.sql.impl.MysqlMaker;
+import cst.gu.util.sql.test.LoggerUtil;
 import cst.gu.util.string.StringUtil;
 
 /**
@@ -28,14 +26,13 @@ import cst.gu.util.string.StringUtil;
 public abstract class SqlTxUtil {
 	private static final ThreadLocal<Connection> thconns = new ThreadLocal<Connection>();
 	private static final ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
-	private static Logger logger = Logger.getLogger(SqlTxUtil.class);
 	protected abstract Connection getConnection();
 
 	/**************************************************** transaction ***************************************************/
 	public synchronized SqlTxUtil beginTx() {
 
 		if (getThtx()) {
-			System.out.println("事务已经开启");
+			LoggerUtil.infoLog("事务已经开启",LoggerUtil.cutline);
 		}
 		thtx.set(true);
 		return this;
@@ -77,7 +74,7 @@ public abstract class SqlTxUtil {
 		try {
 			Connection conn = getTxConn();
 			conn.close();
-			logger.info("关闭Connection[事务] ...");
+			LoggerUtil.infoLog("关闭Connection[事务] ...");
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -406,7 +403,7 @@ public abstract class SqlTxUtil {
 				try {
 					o = new String(bs, charset);
 				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
+					LoggerUtil.errorLog(e);
 				}
 			} else if (o instanceof Blob) {
 				o = StringUtil.blob2String((Blob) o, charset);
@@ -426,7 +423,7 @@ public abstract class SqlTxUtil {
 					pst.setObject(i + 1, o);
 				}
 			} catch (SQLException e) {
-				e.printStackTrace();
+				LoggerUtil.errorLog(e);
 			}
 
 		}
@@ -437,6 +434,7 @@ public abstract class SqlTxUtil {
 			try {
 				st.close();
 			} catch (Exception e) {
+				LoggerUtil.errorLog(e);
 			}
 		}
 		
@@ -445,17 +443,18 @@ public abstract class SqlTxUtil {
 			try {
 				rs.close();
 			} catch (Exception e) {
+				LoggerUtil.errorLog(e);
 			}
 		}
 		
 		if (!getThtx()) {
 			try {
 				if (conn != null && !conn.isClosed()) {
-					logger.info("关闭Connection ...");
 					conn.close();
+					LoggerUtil.infoLog("关闭Connection ...");
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
+				LoggerUtil.errorLog(e);
 			}
 		}
 
@@ -467,18 +466,18 @@ public abstract class SqlTxUtil {
 			// 如果已开启事务,则从当前线程获取Connection
 			Connection conn = thconns.get();
 			if (conn == null) {
-				logger.info("获取Connection[事务] ...");
+				LoggerUtil.infoLog("获取Connection[事务] ...");
 				try {
 					conn = getConnection();
 					conn.setAutoCommit(false);
 				} catch (SQLException e) {
-					e.printStackTrace();
+					LoggerUtil.errorLog(e);
 				}
 			}
 			thconns.set(conn);
 			return conn;
 		} else {
-			logger.info("获取Connection ...");
+			LoggerUtil.infoLog("获取Connection ...");
 			return getConnection();
 		}
 	}

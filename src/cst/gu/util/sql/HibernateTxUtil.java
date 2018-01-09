@@ -4,11 +4,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.connection.ConnectionProvider;
 import org.hibernate.engine.SessionFactoryImplementor;
+
+import cst.gu.util.sql.test.LoggerUtil;
 
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
@@ -22,7 +23,6 @@ import org.hibernate.engine.SessionFactoryImplementor;
  * 
  */
 public abstract class HibernateTxUtil extends SqlTxUtil{
-	private static Logger logger = Logger.getLogger(HibernateTxUtil.class);
 	private static ConnectionProvider cp = null;
 	private static ThreadLocal<Session> thse = new ThreadLocal<Session>();
 	private static ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
@@ -37,7 +37,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		 try {
 			return cp.getConnection();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			LoggerUtil.errorLog(e);
 		}
 		 return null;
 	}
@@ -45,7 +45,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 	/**************************************************** transaction ***************************************************/
 	public synchronized HibernateTxUtil beginTx() {
 		if (getTx()) {
-			System.out.println("事务已经开启");
+			LoggerUtil.infoLog("事务已经开启",LoggerUtil.cutline);
 		}
 		thtx.set(true);
 		super.beginTx();
@@ -83,7 +83,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		thtx.remove();
 		thse.remove();
 		se.close();
-		logger.info("关闭Session[事务] ...");
+		LoggerUtil.infoLog("关闭Session[事务] ...");
 		super.endTx();
 		return this;
 	}
@@ -179,14 +179,14 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 		if (getTx()) {
 			Session se = thse.get();
 			if(se == null){
-				logger.info("获取Session[事务] ...");
+				LoggerUtil.infoLog("获取Session[事务] ...");
 				se = getSession();
 				se.beginTransaction();
 			}
 			thse.set(se);
 			return se;
 		} else {
-			logger.info("获取Session ...");
+			LoggerUtil.infoLog("获取Session ...");
 			return getSession();
 		}
 	}
@@ -196,7 +196,7 @@ public abstract class HibernateTxUtil extends SqlTxUtil{
 			if (session != null && session.isOpen()) {
 				session.flush();
 				session.close();
-				logger.info("关闭Session ...");
+				LoggerUtil.infoLog("关闭Session ...");
 			}
 		} else {
 			// session.flush();
