@@ -16,8 +16,21 @@ public abstract class ObjectUtil {
 	 * 将null 转为 "" 其他不变
 	 * @param o
 	 * @return
+	 * @see obj2String
 	 */
 	public static String toString(Object o){
+		if(o == null){ 
+			return "";}
+		return o.toString();
+	}
+	
+	/**
+	 * 将null 转为 "" 
+	 * 调用toString方法
+	 * @param o
+	 * @return
+	 */
+	public static String obj2String(Object o){
 		if(o == null){ 
 			return "";}
 		return o.toString();

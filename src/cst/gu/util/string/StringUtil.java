@@ -126,7 +126,7 @@ public class StringUtil extends ObjectUtil {
 		}
 
 		if (className.equals("java.sql.Blob")) {
-			return new javax.sql.rowset.serial.SerialBlob(value.getBytes());
+			return string2Blob(value, "utf-8");
 		}
 
 		if (className.equals("java.sql.Date")) {
