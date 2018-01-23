@@ -11,7 +11,11 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialException;
 
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
@@ -24,6 +28,7 @@ import cst.gu.util.string.StringUtil;
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
  */
 public abstract class SqlTxUtil {
+	private static final String charset = "uft-8";
 	private static final ThreadLocal<Connection> thconns = new ThreadLocal<Connection>();
 	private static final ThreadLocal<Boolean> thtx = new ThreadLocal<Boolean>();
 	protected abstract Connection getConnection();
@@ -202,7 +207,7 @@ public abstract class SqlTxUtil {
 			while (rs.next()) {
 				Map<String, Object> row = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; i++) {
-					row.put(rsmd.getColumnName(i), rs.getObject(i));
+					row.put(rsmd.getColumnName(i),byteArray2Blob(rs.getObject(i), charset) );
 				}
 				rowList.add(row);
 			}
@@ -230,7 +235,7 @@ public abstract class SqlTxUtil {
 				Map<String, Object> row = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; i++) {
 					Object v = rs.getObject(i);
-					v = binary2String(v, charset);
+					v = SqlTxUtil.binary2String(v, charset);
 					row.put(rsmd.getColumnName(i), v);
 				}
 				rowList.add(row);
@@ -266,7 +271,7 @@ public abstract class SqlTxUtil {
 				Map<String, String> rsMap = Containers.newHashMap();
 				for (int i = 1; i <= columnCount; ++i) {
 					Object v = rs.getObject(i);
-					v = binary2String(v, charset);
+					v = SqlTxUtil.binary2String(v, charset);
 					rsMap.put(rsmd.getColumnName(i), StringUtil.toString(v));
 				}
 				list.add(rsMap);
@@ -293,7 +298,7 @@ public abstract class SqlTxUtil {
 				ResultSetMetaData rsmd = rs.getMetaData();
 				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
 					String filedname = rsmd.getColumnName(i).toLowerCase();
-					rsMap.put(filedname, rs.getObject(i));
+					rsMap.put(filedname, byteArray2Blob(rs.getObject(i), charset));
 				}
 			}
 		} catch (SQLException e) {
@@ -383,7 +388,7 @@ public abstract class SqlTxUtil {
 			rs = pstmt.executeQuery();
 			if (rs != null) {
 				while (rs.next()) {
-					set.add(StringUtil.toString(binary2String(rs.getObject(1), "utf-8")));
+					set.add(StringUtil.toString(SqlTxUtil.binary2String(rs.getObject(1), "utf-8")));
 				}
 			}
 		} catch (SQLException e) {
@@ -392,25 +397,6 @@ public abstract class SqlTxUtil {
 			closeAll(conn, pstmt, rs);
 		}
 		return set;
-	}
-
-	/**************************************************** private ***************************************************/
-
-	private Object binary2String(Object o, String charset) {
-		if (o != null) {
-			if (o instanceof byte[]) {
-				byte[] bs = (byte[]) o;
-				try {
-					o = new String(bs, charset);
-				} catch (UnsupportedEncodingException e) {
-					LoggerUtil.errorLog(e);
-				}
-			} else if (o instanceof Blob) {
-				o = StringUtil.blob2String((Blob) o, charset);
-			}
-		}
-		return o;
-
 	}
 
 	private void setParams(PreparedStatement pst, Object... objs) {
@@ -493,6 +479,66 @@ public abstract class SqlTxUtil {
 			return false;
 		}
 		return tx.booleanValue();
+	}
+
+	private static Object binary2String(Object o, String charset) {
+		if (o != null) {
+			if (o instanceof byte[]) {
+				byte[] bs = (byte[]) o;
+				try {
+					o = new String(bs, charset);
+				} catch (UnsupportedEncodingException e) {
+					LoggerUtil.errorLog(e);
+				}
+			} else if (o instanceof Blob) {
+				o = StringUtil.blob2String((Blob) o, charset);
+			}
+		}
+		return o;
+	}
+	
+	/**
+	 * 将byte[]变为 blob
+	 * 由于jdbc不同版本查询数据库的blob字段,有些返回byte[] 有些返回blob,使之统一成blob
+	 * @param o
+	 * @param charset
+	 * @return
+	 */
+	private static Object byteArray2Blob(Object o, String charset){
+		if (o != null && o instanceof byte[]) {
+			try {
+				return new SerialBlob((byte[]) o);
+			} catch (SerialException e) {
+				LoggerUtil.errorLog(e);
+			} catch (SQLException e) {
+				LoggerUtil.errorLog(e);
+			}
+		}
+		return o;
+	}
+	
+	/**
+	 * 将byte[]变为 blob
+	 * 由于jdbc不同版本查询数据库的blob字段,有些返回byte[] 有些返回blob,使之统一成blob
+	 * @param o
+	 * @param charset
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private static void byteArray2Blob(Map<Object,Object> map, String charset){
+		Set<Entry<Object, Object>> entrys = map.entrySet();
+		for(Entry<Object, Object> e: entrys){
+			Object value = e.getValue();
+			if (value != null && value instanceof byte[]) {
+				try {
+					e.setValue(new SerialBlob((byte[]) value));
+				} catch (SerialException e1) {
+					LoggerUtil.errorLog(e1);
+				} catch (SQLException e1) {
+					LoggerUtil.errorLog(e1);
+				}
+			}
+		}
 	}
 
 }
