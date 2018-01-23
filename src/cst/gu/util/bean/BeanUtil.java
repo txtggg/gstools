@@ -2,6 +2,7 @@ package cst.gu.util.bean;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.sql.Blob;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -111,7 +112,15 @@ public final class BeanUtil {
 						if (v != null) {
 							String type = field.getType().getName();
 							// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
-							if (!type.equals(v.getClass().getName())) {
+							
+							/**
+							 * 如果type是blob
+							 */
+							if(type.equals("java.sql.Blob")){
+								if(!(v instanceof Blob)){
+									v = StringUtil.string2Blob(v.toString(), "utf-8");
+								}
+							}else if (!type.equals(v.getClass().getName())) {
 								v = StringUtil.string2ObjectWithAnno(field.getType(), v.toString());
 							}
 						}
@@ -145,10 +154,14 @@ public final class BeanUtil {
 					String fieldName = field.getName();
 					if(map.containsKey(fieldName)){
 						Object v = map.get(fieldName);
-						
 						if (v != null) {
 							String type = field.getType().getName();
 							// 如果字段类型与map中的类型不一致,要把值转为对应的bean的字段类型值
+							if(type.equals("java.sql.Blob")){
+								if(!(v instanceof Blob)){
+									v = StringUtil.string2Blob(v.toString(), "utf-8");
+								}
+							}else
 							if (!type.equals(v.getClass().getName())) {
 								v = StringUtil.string2Object(field.getType(), v.toString());
 							}
