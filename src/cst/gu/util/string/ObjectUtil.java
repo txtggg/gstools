@@ -12,6 +12,7 @@ import java.util.List;
  */
 public abstract class ObjectUtil {
 	
+	
 	/**
 	 * 将null 转为 "" 其他不变
 	 * @param o

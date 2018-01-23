@@ -276,6 +276,7 @@ public class StringUtil extends ObjectUtil {
 		}
 		return content;
 	}
+ 
 
 	/**
 	 * 截取字符串的前{length}部分,解决空指针,下标越界问题
