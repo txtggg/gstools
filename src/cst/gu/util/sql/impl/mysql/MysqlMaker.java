@@ -1,4 +1,4 @@
-package cst.gu.util.sql.impl;
+package cst.gu.util.sql.impl.mysql;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -8,6 +8,7 @@ import cst.gu.util.annotation.AnnoBeanUtil;
 import cst.gu.util.annotation.AnnoUtil;
 import cst.gu.util.container.Containers;
 import cst.gu.util.sql.SqlMaker;
+import cst.gu.util.sql.test.LoggerUtil;
 
 /**
  * @author guweichao 
@@ -192,9 +193,9 @@ public class MysqlMaker implements SqlMaker {
 				o = f.get(bean);
 			}
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			LoggerUtil.errorLog(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			LoggerUtil.errorLog(e);
 		}
 		return o;
 	}

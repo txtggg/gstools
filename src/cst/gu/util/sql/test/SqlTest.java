@@ -7,6 +7,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 
+import cst.gu.util.container.Containers;
 import cst.gu.util.file.FileUtil;
 import cst.gu.util.sql.SqlTxUtil;
 import cst.gu.util.string.StringUtil;
@@ -32,21 +33,15 @@ public class SqlTest {
 				return null;
 			}
 		};
-		String cs = "utf-8";
-		ObjectBean ob = new ObjectBean();
-//		ob.setProject_id(24);
-//		ob.setObj_name(StringUtil.string2Blob("我是谷魏朝1", cs));
-//		ob.setObj_type("ocode");
-//		ob.setObj_description("desc1");
-//		sql.insertBean(ob);
-		
-		
-		ob.setObject_id(8);
-		sql.getBean(ob);
-		
-		Map m = sql.query("select * from t_objects where object_id = ?", 6);
-		System.out.println(StringUtil.blob2String((Blob) m.get("obj_name"), cs));
-		
+		long t1 = System.currentTimeMillis();
+		Map<String,Object> m1 = Containers.newHashMap();
+		for(int x =0;x<1000;x++){
+			m1 = sql.query("select * from t_user where user_id = ?", 1);
+			System.out.println(m1);
+		}
+		long t2 = System.currentTimeMillis();
+		System.out.println("zongshijian:"+(t2 - t1));
+		// 10000次20536ms  ;; 1000次 2750ms
 		
 		
 	}

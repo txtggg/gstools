@@ -19,7 +19,7 @@ import javax.sql.rowset.serial.SerialException;
 
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
-import cst.gu.util.sql.impl.MysqlMaker;
+import cst.gu.util.sql.impl.mysql.MysqlMaker;
 import cst.gu.util.sql.test.LoggerUtil;
 import cst.gu.util.string.StringUtil;
 
