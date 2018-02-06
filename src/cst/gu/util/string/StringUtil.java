@@ -139,9 +139,10 @@ public class StringUtil extends ObjectUtil {
 		return null;
 
 	}
-	
+
 	/**
 	 * 所有字段都为空(null或者"")
+	 * 
 	 * @param str
 	 * @return
 	 */
@@ -153,9 +154,10 @@ public class StringUtil extends ObjectUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 至少有一个参数为空(null或者trim后为空)
+	 * 
 	 * @param str
 	 * @return
 	 */
@@ -167,9 +169,10 @@ public class StringUtil extends ObjectUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 所有字段trim后都为空(null或者"")
+	 * 
 	 * @param str
 	 * @return
 	 */
@@ -181,9 +184,10 @@ public class StringUtil extends ObjectUtil {
 		}
 		return true;
 	}
-	
+
 	/**
 	 * 至少有一个参数为空(null或者trim后为空)
+	 * 
 	 * @param str
 	 * @return
 	 */
@@ -195,7 +199,7 @@ public class StringUtil extends ObjectUtil {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * 判断字段为空白(=null 或者length=0 )
 	 * 
@@ -238,11 +242,11 @@ public class StringUtil extends ObjectUtil {
 	 * 
 	 * @param str
 	 * @param charsetName
-	 *            编码 建议使用GsFinalStrings.CharSet_*
 	 * @return
 	 * @throws Exception
 	 */
 	public static Blob string2Blob(String str, String charsetName) {
+
 		if (!isBlank(str)) {
 			try {
 				return new SerialBlob(str.getBytes(charsetName));
@@ -254,21 +258,41 @@ public class StringUtil extends ObjectUtil {
 	}
 
 	/**
-	 * 由于将blob.length()强转为 int 类.因此对于长度超过int.MaxValue的blob 转化会发生错误
 	 * 
+	 * @param str
+	 * @param charsetName
+	 * @return
+	 * @throws Exception
+	 * @deprecated 不指定charset转blob,在不同系统下可能结果不同.为兼容旧的系统保留,不建议使用
+	 */
+	public static Blob string2Blob(String str) {
+
+		if (!isBlank(str)) {
+			try {
+				return new SerialBlob(str.getBytes());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * @deprecated 不指定charset转blob,在不同系统下可能结果不同.为兼容旧的系统保留,不建议使用
+	 *             由于将blob.length()强转为 int 类.因此对于长度超过int.MaxValue的blob 转化会发生错误
 	 * @param blob
 	 * @param charsetName
 	 * @return 默认返回"" 不会返回null
 	 * @throws Exception
 	 */
-	public static String blob2String(Blob blob, String charsetName) {
+	public static String blob2String(Blob blob) {
 		String content = "";
 		if (blob != null) {
 			try {
 				int len = (int) blob.length();
 				if (len > 0) {
 					byte[] bytes = blob.getBytes(1L, len);
-					content = new String(bytes, charsetName);
+					content = new String(bytes);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -276,7 +300,28 @@ public class StringUtil extends ObjectUtil {
 		}
 		return content;
 	}
- 
+	/**
+	 * 由于将blob.length()强转为 int 类.因此对于长度超过int.MaxValue的blob 转化会发生错误
+	 * @param blob
+	 * @param charsetName
+	 * @return 默认返回"" 不会返回null
+	 * @throws Exception
+	 */
+	public static String blob2String(Blob blob,String charset) {
+		String content = "";
+		if (blob != null) {
+			try {
+				int len = (int) blob.length();
+				if (len > 0) {
+					byte[] bytes = blob.getBytes(1L, len);
+					content = new String(bytes,charset);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		return content;
+	}
 
 	/**
 	 * 截取字符串的前{length}部分,解决空指针,下标越界问题
@@ -441,8 +486,9 @@ public class StringUtil extends ObjectUtil {
 			if (isBlank(split)) {
 				int iv1 = tryToInt(v1);
 				int iv2 = tryToInt(v2);
-				if (iv1 == iv2){
-					return 0;}
+				if (iv1 == iv2) {
+					return 0;
+				}
 				if (iv1 > iv2) {
 					return 1;
 				}

@@ -11,7 +11,6 @@ import java.sql.Statement;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -517,28 +516,4 @@ public abstract class SqlTxUtil {
 		return o;
 	}
 	
-	/**
-	 * 将byte[]变为 blob
-	 * 由于jdbc不同版本查询数据库的blob字段,有些返回byte[] 有些返回blob,使之统一成blob
-	 * @param o
-	 * @param charset
-	 * @return
-	 */
-	@SuppressWarnings("unused")
-	private static void byteArray2Blob(Map<Object,Object> map, String charset){
-		Set<Entry<Object, Object>> entrys = map.entrySet();
-		for(Entry<Object, Object> e: entrys){
-			Object value = e.getValue();
-			if (value != null && value instanceof byte[]) {
-				try {
-					e.setValue(new SerialBlob((byte[]) value));
-				} catch (SerialException e1) {
-					LoggerUtil.errorLog(e1);
-				} catch (SQLException e1) {
-					LoggerUtil.errorLog(e1);
-				}
-			}
-		}
-	}
-
 }
