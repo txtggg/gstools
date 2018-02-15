@@ -28,7 +28,7 @@ public abstract class ObjectUtil {
 	
 	/**
 	 * 将null 转为 "" 
-	 * 调用toString方法
+	 * 调用Object的toString方法
 	 * @param o
 	 * @return
 	 */

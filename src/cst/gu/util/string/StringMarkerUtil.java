@@ -82,7 +82,7 @@ public class StringMarkerUtil {
 				marker = marker.substring(0, end + 1);
 				if (marker.length() > 3) {
 					String markerKey = marker.substring(2, marker.length() - 1);
-					return content.replace(marker, StringUtil.toString(markers.get(markerKey)));
+					return content.replace(marker, StringUtil.obj2String(markers.get(markerKey)));
 				}
 			}
 		}
