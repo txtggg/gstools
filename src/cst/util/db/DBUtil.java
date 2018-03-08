@@ -23,13 +23,14 @@ import cst.gu.util.string.StringUtil;
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
-	@deprecated 开发中,
+ * @deprecated 开发中,
+ * 应该使用动态代理,处理getter中返回值为bean的对象
  */
 public abstract class DBUtil {
 
 	protected abstract Connection getConnection();
+
 	protected abstract void CloseConnection(Connection conn);
- 
 
 	/**************************************************** jdbc ***************************************************/
 
@@ -62,7 +63,7 @@ public abstract class DBUtil {
 	 * @param o
 	 * @return
 	 */
-	public void updateBean(IBean o) {
+	public void update(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.update();
 		update(mk.getSql(), mk.getParams());
@@ -74,7 +75,7 @@ public abstract class DBUtil {
 	 * @param o
 	 * @return
 	 */
-	public int deleteBean(IBean o) {
+	public int delete(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.delete();
 		return update(mk.getSql(), mk.getParams());
@@ -117,7 +118,7 @@ public abstract class DBUtil {
 	 * @param o
 	 * @return 新插入语句的主键id
 	 */
-	public int insertBean(IBean o) {
+	public int insert(Object o) {
 		SqlMaker mk = new MysqlMaker(o);
 		mk.insert();
 		return insert(mk.getSql(), mk.getParams());
@@ -128,14 +129,14 @@ public abstract class DBUtil {
 	 * 
 	 * @param t
 	 */
-	public void getBean(IBean bean) {
+	public void select(Object bean) {
 		SqlMaker mk = new MysqlMaker(bean);
 		mk.select();
-		Map<String, Object> m = query(mk.getSql(), mk.getParams());
+		Map<String, Object> m = select(mk.getSql(), mk.getParams());
 		BeanUtil.fillValueWithAnnotation(bean, m);
 	}
 
-	public List<Map<String, Object>> queryList(String sql, Object... objs) {
+	public List<Map<String, Object>> selectList(String sql, Object... objs) {
 
 		List<Map<String, Object>> rowList = Containers.newArrayList();
 		PreparedStatement pstmt = null;
@@ -162,72 +163,7 @@ public abstract class DBUtil {
 		return rowList;
 	}
 
-	public List<Map<String, Object>> queryListWithBlob(String charset, String sql, Object... obj) {
-
-		List<Map<String, Object>> rowList = Containers.newArrayList();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnCount = rsmd.getColumnCount();
-			while (rs.next()) {
-				Map<String, Object> row = Containers.newHashMap();
-				for (int i = 1; i <= columnCount; i++) {
-					Object v = rs.getObject(i);
-					v = binary2String(v, charset);
-					row.put(rsmd.getColumnName(i), v);
-				}
-				rowList.add(row);
-			}
-		} catch (SQLException sqlex) {
-			throw new RuntimeException(sqlex);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return rowList;
-	}
-
-	/**
-	 * @author guweichao 20170511 将查询结果全部使用String封装(blob字段使用utf-8解析为string) null
-	 *         会转为""
-	 * @param sql
-	 * @param obj
-	 * @return
-	 */
-	public List<Map<String, String>> queryStringList(String charset, String sql, Object... obj) {
-
-		List<Map<String, String>> list = Containers.newArrayList();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			ResultSetMetaData rsmd = rs.getMetaData();
-			int columnCount = rsmd.getColumnCount();
-			while (rs.next()) {
-				Map<String, String> rsMap = Containers.newHashMap();
-				for (int i = 1; i <= columnCount; ++i) {
-					Object v = rs.getObject(i);
-					v = binary2String(v, charset);
-					rsMap.put(rsmd.getColumnName(i), StringUtil.toString(v));
-				}
-				list.add(rsMap);
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return list;
-	}
-
-	public Map<String, Object> query(String sql, Object... obj) {
+	public Map<String, Object> select(String sql, Object... obj) {
 
 		PreparedStatement pstmt = null;
 		ResultSet rs = null;
@@ -252,114 +188,7 @@ public abstract class DBUtil {
 		return rsMap;
 	}
 
-	/**
-	 * @param sql
-	 *            查询两个字段分别作为作为key和value成为map 如果查询字段数不为2 则返回空map
-	 * @return
-	 */
-	public Map<String, String> mapQuery(String sql, Object... obj) {
-
-		Map<String, String> rsMap = Containers.newHashMap();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			if (rs != null) {
-				ResultSetMetaData rsmd = rs.getMetaData();
-				int columnCount = rsmd.getColumnCount();
-				if (columnCount == 2) {
-					while (rs.next()) {
-						rsMap.put(StringUtil.toString(rs.getObject(1)), StringUtil.toString(rs.getObject(2)));
-					}
-				}
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return rsMap;
-	}
-
-	/**
-	 * 查询单字段,直接装入list 或set
-	 * 
-	 * @param sql
-	 * @param objects
-	 * @return
-	 */
-	public Collection<Object> getOneColumn(Collection<Object> coll, String sql, Object... obj) {
-
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			if (rs != null) {
-				while (rs.next()) {
-					coll.add(rs.getObject(1));
-				}
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return coll;
-	}
-
-	/**
-	 * 查询单字段,直接装入Set
-	 * 
-	 * @param sql
-	 * @param objects
-	 * @return
-	 */
-	public Set<String> getStringSet(String sql, Object... obj) {
-		Set<String> set = Containers.newHashSet();
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			if (rs != null) {
-				while (rs.next()) {
-					set.add(StringUtil.toString(binary2String(rs.getObject(1), "utf-8")));
-				}
-			}
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return set;
-	}
-
 	/**************************************************** private ***************************************************/
-
-	private Object binary2String(Object o, String charset) {
-		if (o != null) {
-			if (o instanceof byte[]) {
-				byte[] bs = (byte[]) o;
-				try {
-					o = new String(bs, charset);
-				} catch (UnsupportedEncodingException e) {
-					e.printStackTrace();
-				}
-			} else if (o instanceof Blob) {
-				o = StringUtil.blob2String((Blob) o, charset);
-			}
-		}
-		return o;
-
-	}
 
 	private void setParams(PreparedStatement pst, Object... objs) {
 		for (int i = 0; i < objs.length; i++) {
@@ -394,8 +223,5 @@ public abstract class DBUtil {
 		}
 		CloseConnection(conn);
 	}
-
-	 
-
 
 }
