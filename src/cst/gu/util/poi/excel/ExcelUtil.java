@@ -27,6 +27,7 @@ import cst.gu.util.datetime.LocalDateUtil;
 import cst.gu.util.exception.FileTypeException;
 import cst.gu.util.file.FileUtil;
 import cst.gu.util.string.StringUtil;
+import cst.util.common.poi.excel.ExcelReader;
 
 /**
  * 
@@ -36,7 +37,9 @@ import cst.gu.util.string.StringUtil;
  *         依赖 apache 的poi包
  *         @version 1.10.7 增加方法templateExport 支持模板导出
  *         @version 1.10.28 templateExport导出,支持导出到第一个sheet,减少map层数
- *         @version 2.11.2 修复缺陷(当导出的数据为空时,标记信息没有被删除)
+ *         @version 2.11.2 修复缺陷(当导出的数据为空时,标记信息没有被删除)\
+ *         @deprecated 
+ *         @see ExcelReader
  */
 public class ExcelUtil {
 	private ExcelUtil() {

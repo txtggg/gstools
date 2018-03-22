@@ -4,7 +4,7 @@
 	<groupId>gstools</groupId>
 	<artifactId>gstools</artifactId>
 	<version>0.0.2-SNAPSHOT</version>
-	<build>
+		<build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
@@ -33,12 +33,6 @@
 			<groupId>dom4j</groupId>
 			<artifactId>dom4j</artifactId>
 			<version>1.6.1</version>
-		</dependency>
-		<!-- https://mvnrepository.com/artifact/net.sf.mpxj/mpxj -->
-		<dependency>
-			<groupId>net.sf.mpxj</groupId>
-			<artifactId>mpxj</artifactId>
-			<version>4.7.6</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/cglib/cglib -->

@@ -1,29 +1,23 @@
-package cst.util.db;
+package cst.util.common.db;
 
-import java.io.UnsupportedEncodingException;
-import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
-import cst.gu.util.sql.IBean;
 import cst.gu.util.sql.SqlMaker;
-import cst.gu.util.sql.impl.MysqlMaker;
-import cst.gu.util.string.StringUtil;
+import cst.gu.util.sql.impl.mysql.MysqlMaker;
 
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
- * @deprecated 开发中,
+ * @deprecated 开发中,不能使用
  * 应该使用动态代理,处理getter中返回值为bean的对象
  */
 public abstract class DBUtil {
@@ -80,7 +74,7 @@ public abstract class DBUtil {
 		mk.delete();
 		return update(mk.getSql(), mk.getParams());
 	}
-
+	
 	/**
 	 * 执行insert
 	 * 
