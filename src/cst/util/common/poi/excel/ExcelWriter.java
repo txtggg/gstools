@@ -14,5 +14,9 @@ public final class ExcelWriter {
 	public static void map2Excel(String filePath){
 		
 	}
+	
+	public static void setMarkers(){
+		
+	}
 }
 
