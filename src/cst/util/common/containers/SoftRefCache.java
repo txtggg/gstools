@@ -1,7 +1,10 @@
 package cst.util.common.containers;
 
 import java.lang.ref.SoftReference;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,16 +39,31 @@ public abstract class SoftRefCache<K, V> {
 
 	}
 
-	private void remove(K k) {
-
+	public void remove(K k) {
+		map.remove(k);
 	}
 
-	private void clearAll() {
-
+	public void clearAll() {
+		map.clear();
 	}
 
-	private void clearNull() {
-
+	public void clearNull() {
+		Set<K> nullKey = new HashSet<K>();
+		Set<Entry<K, SoftReference<V>>> entrys = map.entrySet();
+		for(Entry<K, SoftReference<V>> e :entrys){
+			SoftReference<V> sv = e.getValue();
+			if(sv == null){
+				nullKey.add(e.getKey());
+			}else{
+				V v = sv.get();
+				if(v == null){
+					nullKey.add(e.getKey());
+				}
+			}
+		}
+		for(K k : nullKey){
+			map.remove(k);
+		}
 	}
 
 }
