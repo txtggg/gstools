@@ -18,7 +18,6 @@ public abstract class ObjectUtil {
 	 * @param o
 	 * @return
 	 * @see obj2String
-	 * @deprecated
 	 */
 	public static String toString(Object o){
 		if(o == null){ 

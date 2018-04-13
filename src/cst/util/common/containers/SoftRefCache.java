@@ -19,7 +19,6 @@ public abstract class SoftRefCache<K, V> {
 
 	/**
 	 * null对象不会被缓存
-	 * 
 	 * @param k
 	 * @param v
 	 */
