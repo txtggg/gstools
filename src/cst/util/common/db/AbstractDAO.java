@@ -130,6 +130,31 @@ public abstract class AbstractDAO {
 		BeanUtil.fillValueWithAnnotation(bean, m);
 	}
 
+	public Map<String, Object> select(String sql, Object... obj) {
+	
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		Map<String, Object> rsMap = Containers.newHashMap();
+		Connection conn = getConnection();
+		try {
+			pstmt = conn.prepareStatement(sql);
+			setParams(pstmt, obj);
+			rs = pstmt.executeQuery();
+			if (rs != null && rs.next()) {
+				ResultSetMetaData rsmd = rs.getMetaData();
+				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+					String filedname = rsmd.getColumnName(i).toLowerCase();
+					rsMap.put(filedname, rs.getObject(i));
+				}
+			}
+		} catch (SQLException e) {
+			new RuntimeException(e);
+		} finally {
+			closeAll(conn, pstmt, rs);
+		}
+		return rsMap;
+	}
+
 	public List<Map<String, Object>> selectList(String sql, Object... objs) {
 
 		List<Map<String, Object>> rowList = Containers.newArrayList();
@@ -155,31 +180,6 @@ public abstract class AbstractDAO {
 			closeAll(conn, pstmt, rs);
 		}
 		return rowList;
-	}
-
-	public Map<String, Object> select(String sql, Object... obj) {
-
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-		Map<String, Object> rsMap = Containers.newHashMap();
-		Connection conn = getConnection();
-		try {
-			pstmt = conn.prepareStatement(sql);
-			setParams(pstmt, obj);
-			rs = pstmt.executeQuery();
-			if (rs != null && rs.next()) {
-				ResultSetMetaData rsmd = rs.getMetaData();
-				for (int i = 1; i <= rsmd.getColumnCount(); i++) {
-					String filedname = rsmd.getColumnName(i).toLowerCase();
-					rsMap.put(filedname, rs.getObject(i));
-				}
-			}
-		} catch (SQLException e) {
-			new RuntimeException(e);
-		} finally {
-			closeAll(conn, pstmt, rs);
-		}
-		return rsMap;
 	}
 
 	/**************************************************** private ***************************************************/
