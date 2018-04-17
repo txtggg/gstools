@@ -3,17 +3,20 @@ package cst.util.common.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import javax.sql.DataSource;
 
 /**
  * @author gwc
  * @version v201804 线程事务DAO 同一线程,使用同一事务
  */
-public abstract class AbstractThreadTxDAO extends AbstractDAO {
+public abstract class AbstractInstanceTxDAO extends AbstractDAO {
+	private static DataSource datasource;
+	private Connection conn;
 	private ThreadLocal<Connection> conns = new ThreadLocal<Connection>() {
 		protected Connection initialValue() {
-			Connection conn = getConnection();
+			 conn = getConnection();
 			try {
-				conns.get().setAutoCommit(false);
+				conn.setAutoCommit(false);
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -23,7 +26,7 @@ public abstract class AbstractThreadTxDAO extends AbstractDAO {
 	
 	public void rollback(){
 		try {
-			conns.get().rollback();
+			conn.rollback();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -31,7 +34,7 @@ public abstract class AbstractThreadTxDAO extends AbstractDAO {
 	
 	public void commit() {
 		try {
-			conns.get().commit();
+			conn.commit();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -40,8 +43,7 @@ public abstract class AbstractThreadTxDAO extends AbstractDAO {
 	@Override
 	protected void CloseConnection(Connection conn) {
 		try {
-			conns.get().close();
-			conns.remove();
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

@@ -15,8 +15,21 @@ public final class Lists {
 	 * 返回一个arraylist
 	 * @return
 	 */
-	public static <T> List<T> newArrayList(){
+	public static <T> ArrayList<T> newArrayList(){
 		return new ArrayList<T>();
+	}
+	
+	/**
+	 * 返回一个arraylist
+	 * 将指定初始值放入
+	 * @return
+	 */
+	public static <T> List<T> newArrayList(T...t){
+		ArrayList<T> rlist = newArrayList();
+		for(T ti : t){
+			rlist.add(ti);
+		}
+		return rlist;
 	}
 	
 	/**
@@ -24,7 +37,7 @@ public final class Lists {
 	 * @param size
 	 * @return
 	 */
-	public static <T> List<T> newArrayListSized(int size){
+	public static <T> ArrayList<T> newArrayListSized(int size){
 		return new ArrayList<T>(size);
 	}
 	
@@ -33,6 +46,10 @@ public final class Lists {
 			return null;
 		}
 		return list.get(index);
+	}
+	
+	public static <T> boolean isEmpty(List<T> list){
+		return list ==null || list.isEmpty();
 	}
 	
 }

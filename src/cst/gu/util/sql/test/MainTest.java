@@ -1,5 +1,6 @@
 package cst.gu.util.sql.test;
 
+import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +10,9 @@ import java.util.Map;
 
 import cst.gu.util.container.Containers;
 import cst.gu.util.datetime.LocalDateUtil;
+import cst.util.common.containers.Lists;
+import cst.util.common.file.Files;
+import cst.util.common.poi.excel.ExcelWriter;
 
 /**
  * @author guweichao 20171102
@@ -17,26 +21,19 @@ import cst.gu.util.datetime.LocalDateUtil;
 public class MainTest {
  
 	public static void main(String[] args) {
-//		Date d1 = LocalDateUtil.simpleParseDay("2018-02-05");
-//		Date d2 = LocalDateUtil.simpleParseDay("2018-01-31");
-//		System.out.println(LocalDateUtil.getWeeksBetween(d1, d2));
 		
-//		List<Object> l = Containers.newArrayList();
-//		l.add(new Date());
-//		l.add("Strrr");
-//		l.add(15);
-//		System.out.println(l.toArray().length);
-//		 DecimalFormat format1_percent=new DecimalFormat("#0.0%");
-//		 System.out.println(format1_percent.format(0.4436));
-		List<Map<String,Object>> l1 = new ArrayList<Map<String,Object>>();
-		Map<String,Object> m1 = new HashMap<String, Object>();
-		l1.add(m1);
-		m1.put("ss", "ddd");
-		System.out.println(l1);
-		m1 = null;
-		System.out.println(l1);
-		
-	 
+		String fileName = "C:\\Users\\gwc\\Desktop\\download\\gwc.xls";
+		File file = new File(fileName);
+		List<String> row1 = Lists.newArrayList("guweichao","wangweichao","刘腾飞");
+		List<String> row2 = Lists.newArrayList("guweichao1","wangweichao2","刘腾飞2");
+		List<String> row3 = Lists.newArrayList("guweichao2","wangweichao3","刘腾飞3");
+		List<List<String>> sheet1 = Lists.newArrayList(row1);
+		List<List<String>> sheet2 = Lists.newArrayList(row1,row2);
+		List<List<String>> sheet3 = Lists.newArrayList(row2,row3);
+		List<List<String>> sheet4 = Lists.newArrayList(row3,row2,row1);
+		List<List<List<String>>> excel = Lists.newArrayList(sheet1,sheet2,sheet4,sheet3);
+		byte[] bytes = ExcelWriter.list2Excel(excel, true);
+		Files.writeInfo(file, bytes);
 	}
 	public static void ts() {
 		Map<String,Object> map = new HashMap<String, Object>();

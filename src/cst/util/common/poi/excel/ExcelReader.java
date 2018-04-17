@@ -31,7 +31,7 @@ public final class ExcelReader {
 	 * 
 	 */
 	public static List<List<List<String>>> excel2List(InputStream excel, boolean xls) throws IOException {
-		return ExcelReaders.workBook2List(ExcelReaders.getWorkbook(excel, xls));
+		return ExcelUtil.workBook2List(ExcelUtil.getWorkbook(excel, xls));
 	}
 
 	/**
@@ -41,7 +41,7 @@ public final class ExcelReader {
 	 * @throws IOException
 	 */
 	public static List<List<List<String>>> excel2List(String filePath) {
-		return ExcelReaders.workBook2List(ExcelReaders.getWorkbook(filePath));
+		return ExcelUtil.workBook2List(ExcelUtil.getWorkbook(filePath));
 	}
 
 	/**
@@ -52,12 +52,12 @@ public final class ExcelReader {
 	 * @throws IOException
 	 */
 	public static Map<String, List<List<String>>> excel2Map(InputStream excel, boolean xls) throws IOException {
-		Workbook wb = ExcelReaders.getWorkbook(excel, xls);
+		Workbook wb = ExcelUtil.getWorkbook(excel, xls);
 		int s = wb.getNumberOfSheets();
 		Map<String, List<List<String>>> emap = Maps.newHashMapSized(s);
 		for (int x = 0; x < s; x++) {
 			Sheet sheet = wb.getSheetAt(x);
-			emap.put(sheet.getSheetName(), ExcelReaders.sheet2List(wb.getSheetAt(x)));
+			emap.put(sheet.getSheetName(), ExcelUtil.sheet2List(wb.getSheetAt(x)));
 		}
 		Files.closeIO(wb);
 		return emap;
@@ -71,12 +71,12 @@ public final class ExcelReader {
 	 * @throws IOException
 	 */
 	public static Map<String, List<List<String>>> excel2Map(String filePath)  {
-		Workbook wb = ExcelReaders.getWorkbook(filePath);
+		Workbook wb = ExcelUtil.getWorkbook(filePath);
 		int s = wb.getNumberOfSheets();
 		Map<String, List<List<String>>> emap = Maps.newHashMapSized(s);
 		for (int x = 0; x < s; x++) {
 			Sheet sheet = wb.getSheetAt(x);
-			emap.put(sheet.getSheetName(), ExcelReaders.sheet2List(wb.getSheetAt(x)));
+			emap.put(sheet.getSheetName(), ExcelUtil.sheet2List(wb.getSheetAt(x)));
 		}
 		Files.closeIO(wb);
 		return emap;
@@ -118,21 +118,21 @@ public final class ExcelReader {
 	 * @throws IOException
 	 */
 	public static List<List<String>> getSheet(InputStream excel, boolean xls, int index) throws IOException {
-		Workbook wb = ExcelReaders.getWorkbook(excel, xls);
-		return ExcelReaders.sheet2List(wb.getSheetAt(index));
+		Workbook wb = ExcelUtil.getWorkbook(excel, xls);
+		return ExcelUtil.sheet2List(wb.getSheetAt(index));
 	}
 
 	public static List<List<String>> getSheet(InputStream excel, boolean xls, String sheetName) throws IOException {
-		Workbook wb = ExcelReaders.getWorkbook(excel, xls);
-		return ExcelReaders.sheet2List(wb.getSheet(sheetName));
+		Workbook wb = ExcelUtil.getWorkbook(excel, xls);
+		return ExcelUtil.sheet2List(wb.getSheet(sheetName));
 	}
 
 	public static List<List<String>> getSheet(String filePath, String sheetName) {
-		return ExcelReaders.sheet2List(ExcelReaders.getWorkbook(filePath).getSheet(sheetName));
+		return ExcelUtil.sheet2List(ExcelUtil.getWorkbook(filePath).getSheet(sheetName));
 	}
 	
 	public static List<List<String>> getSheet(String filePath, int index) {
-		return ExcelReaders.sheet2List(ExcelReaders.getWorkbook(filePath).getSheetAt(index));
+		return ExcelUtil.sheet2List(ExcelUtil.getWorkbook(filePath).getSheetAt(index));
 	}
 
 

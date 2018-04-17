@@ -1,5 +1,6 @@
 package cst.util.common.poi.excel;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -17,10 +18,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.containers.Lists;
-import cst.util.common.exception.FileTypeException;
 import cst.util.common.file.Files;
 
-class ExcelReaders {
+class ExcelUtil {
 	private final static String exInfo = "文件格式错误,必须是.xls或xlsx文件";
 
 	static List<List<String>> sheet2List(Sheet sheet) {
@@ -114,13 +114,25 @@ class ExcelReaders {
 		return wb;
 	}
 
-	public static List<List<List<String>>> workBook2List(Workbook wb) {
+	static List<List<List<String>>> workBook2List(Workbook wb) {
 		int s = wb.getNumberOfSheets();
 		List<List<List<String>>> elist = Lists.newArrayListSized(s);
 		for (int x = 0; x < s; x++) {
-			elist.add(ExcelReaders.sheet2List(wb.getSheetAt(x)));
+			elist.add(ExcelUtil.sheet2List(wb.getSheetAt(x)));
 		}
 		Files.closeIO(wb);
 		return elist;
+	}
+
+	static byte[] workbook2ByteArray(Workbook wb) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		try {
+			wb.write(baos);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			Files.closeIO(baos);
+		}
+		return baos.toByteArray();
 	}
 }

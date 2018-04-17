@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 
-import cst.gu.util.exception.FileTypeException;
 import cst.gu.util.file.FileUtil;
 import cst.gu.util.string.StringMarkerUtil;
 import cst.gu.util.string.StringUtil;
+import cst.util.common.poi.excel.FileTypeException;
 
 /**
  * @author guweichao 20170919 

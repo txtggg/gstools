@@ -17,7 +17,6 @@ import cst.gu.util.sql.impl.mysql.MysqlMaker;
 /**
  * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
  *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
- * @deprecated 开发中,不能使用
  * 应该使用动态代理,处理getter中返回值为bean的对象
  */
 public abstract class AbstractDAO {
