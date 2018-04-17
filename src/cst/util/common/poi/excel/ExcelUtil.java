@@ -84,12 +84,18 @@ class ExcelUtil {
 		}
 	}
 
-	static Workbook getWorkbook(InputStream in, boolean xls) throws IOException {
-		if (xls) {
-			return new HSSFWorkbook(in);
-		} else {
-			return new XSSFWorkbook(in);
+	static Workbook getWorkbook(InputStream in, boolean xls) {
+		Workbook wb = null;
+		try{
+			if (xls) {
+				wb = new HSSFWorkbook(in);
+			} else {
+				wb = new  XSSFWorkbook(in);
+			}
+		}catch(IOException e){
+			throw new RuntimeException(e);
 		}
+		return wb;
 	}
 
 	static Workbook getWorkbook(String file) {
