@@ -3,52 +3,52 @@ package cst.util.common.poi.excel;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-
 import cst.gu.util.string.StringUtil;
 import cst.util.common.containers.Lists;
 import cst.util.common.containers.Maps;
 import cst.util.common.file.Files;
+import cst.util.common.string.Strings;
 
 /**
  * @author gwc
  * @version 18.3 通过poi操作excel,实现map list 与excel文件的互相操作
- * @deprecated 开发中不可使用
  */
 public final class ExcelWriter {
-	private ExcelWriter(){}
- 
+//	private static final String regListMarker = "\\$\\{.*..*\\}";
+//	private static final String regMapMarker = "\\$\\{.*\\}";
+	private ExcelWriter() {
+	}
+
 	/**
 	 * 将list内容顺序写入excel
+	 * 
 	 * @param list:从外到内,分别是sheet内容,row内容,cell内容
 	 * @param xls:文件格式,true为*.xls;false为*.xlsx
 	 * @return 文件以byte[]返回
 	 */
-	public static byte[] list2Excel(List<List<List<String>>> list,boolean xls){
+	public static byte[] list2Excel(List<List<List<String>>> list, boolean xls) {
 		Workbook wb = ExcelUtil.newWorkbook(xls);
-		if(!Lists.isEmpty(list)){
-			for(int x = 0;x<list.size();x++){
+		if (!Lists.isEmpty(list)) {
+			for (int x = 0; x < list.size(); x++) {
 				Sheet sheet = wb.createSheet();
 				List<List<String>> sheetContent = list.get(x);
-				if(!Lists.isEmpty(sheetContent)){
-					for(int y =0;y<sheetContent.size();y++){
+				if (!Lists.isEmpty(sheetContent)) {
+					for (int y = 0; y < sheetContent.size(); y++) {
 						Row row = sheet.createRow(y);
 						List<String> rowContent = sheetContent.get(y);
-						if(!Lists.isEmpty(rowContent)){
-							for(int z=0;z<rowContent.size();z++){
+						if (!Lists.isEmpty(rowContent)) {
+							for (int z = 0; z < rowContent.size(); z++) {
 								Cell cell = row.createCell(z);
 								String content = rowContent.get(z);
 								cell.setCellValue(content);
@@ -57,32 +57,119 @@ public final class ExcelWriter {
 					}
 				}
 			}
-			
+
 		}
 		byte[] bytes = ExcelUtil.workbook2ByteArray(wb);
 		Files.closeIO(wb);
 		return bytes;
-		 
+
 	}
- 
+
+	private static byte[] setMarkers(Workbook wb, List<Map<String, Object>> infos) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		return baos.toByteArray();
+	}
+
+	private static byte[] setMarkers(Sheet sh, List<Map<String, Object>> infos) {
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		return baos.toByteArray();
+	}
+
+	private static void setMarkers(Sheet sheet, Row row, Map<String, Object> infos) {
+		String rowKey = null;
+		Map<Integer,String> keyMap = Maps.newHashMap();
+		// 检查行内容,抽取listmarker的主key,并替换mapMarker
+		for (int x = 0,lc = row.getLastCellNum(); x < lc; x++) {
+			Cell cell = row.getCell(x);
+			if(cell != null){
+				String content = ExcelUtil.getCellString(cell);
+				String[] marker = checkMarker(content);
+				if(marker != null){
+					String listKey = marker[0];
+					String mapKey = marker[1];
+					if(listKey == null){
+						if(mapKey !=null){
+							cell.setCellValue(Strings.toString(infos.get(mapKey)));
+						}
+					}else{
+						if(rowKey == null){
+							rowKey = listKey;
+						}else if(!rowKey.equals(listKey)){
+							throw new RuntimeException("marker标记错误:"+content);
+						}
+						keyMap.put(x, mapKey);
+					}
+				}
+			}
+		}
+		// 存在listMarker,需要处理
+		if(rowKey != null){
+			@SuppressWarnings("unchecked")
+			List<Map<String,Object>> listInfo = (List<Map<String, Object>>) infos.get(rowKey); 
+			if(Lists.isEmpty(listInfo)){// 如果为空,只需要把marker替换为空
+				
+			}
+		}
+	}
+	
+	/**
+	 * 
+	 * @param marker
+	 * @return:null表示不是marker不需要处理,markers[0]代表list的key,markers[1]代表map的key
+	 */
+	private static String[] checkMarker(String marker){
+		String[] markers = null;
+		String markerEx = "marker标记错误:"+marker;
+		if(!Strings.isNotBlank(marker)){
+			int start = marker.indexOf("${");
+			int d = marker.indexOf(".");
+			int ld = marker.lastIndexOf(".");
+			if(d != ld){
+				throw new RuntimeException(markerEx);
+			}
+			int end = marker.indexOf("}");
+			int len = marker.length() -1;
+			if(start == 0 && end == len ){//是marker格式的内容
+				if(d != -1){ // ${*.*}
+					String lkey = marker.substring(2, d);
+					String mkey = marker.substring(d+1, len);
+					if(Strings.isNotBlank(lkey) && Strings.isNotBlank(mkey) ){
+						markers = new String[2];
+						markers[0] = lkey;
+						markers[1] = mkey;
+					}else{
+						throw new RuntimeException(markerEx);
+					}
+				}else{// ${*}
+					String mkey = marker.substring(2, len);
+					if(Strings.isNotBlank(mkey)){
+						markers = new String[2];
+						markers[1] = mkey;
+					}else{
+						throw new RuntimeException(markerEx);
+					}
+				}
+			}
+		}
+		return markers;
+	}
+	
+	
+	private static String getMarkerErrorInfo(){
+		return null;
+	}
+
 	public static byte[] templateExport(InputStream template, boolean xls, List<Map<String, Object>> infos) {
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		
+
 		Workbook wb = ExcelUtil.getWorkbook(template, xls);
 		try {
-			if (xls) {
-				wb = new HSSFWorkbook(template);
-			} else {
-				wb = new XSSFWorkbook(template);
-			}
 			int sc = wb.getNumberOfSheets();
 			for (int si = 0; si < sc; si++) {
 				Sheet sh1 = wb.getSheetAt(si);
 
-				List<CellRangeAddress> mergeList = new ArrayList<CellRangeAddress>();
-				for (int cr = 0, crc = sh1.getNumMergedRegions(); cr < crc; cr++) {
-					mergeList.add(sh1.getMergedRegion(cr));
-				}
 				int rows = sh1.getLastRowNum();
 				Map<String, Object> m0 = infos.get(si);
 				for (int x = rows; x >= 0; x--) {
@@ -148,7 +235,7 @@ public final class ExcelWriter {
 										}
 									}
 								}
-							}else{ // 如果标记信息为空,将标记信息列设置为空(避免导出空标签)
+							} else { // 如果标记信息为空,将标记信息列设置为空(避免导出空标签)
 								Set<Entry<Integer, String>> entrys = cmap.entrySet();
 								for (Entry<Integer, String> entry : entrys) {
 									Cell cell = row.getCell(entry.getKey());
@@ -198,11 +285,12 @@ public final class ExcelWriter {
 		}
 
 	}
+
 	private static Row insertRow(Sheet sh, int row) {
 		sh.shiftRows(row, sh.getLastRowNum(), 1, true, false);
 		return sh.createRow(row);
 	}
-	
+
 	/**
 	 * 复制行的样式
 	 */
@@ -254,4 +342,3 @@ public final class ExcelWriter {
 		}
 	}
 }
-
