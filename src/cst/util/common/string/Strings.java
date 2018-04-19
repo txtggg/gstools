@@ -43,9 +43,17 @@ public class Strings extends Objects {
 	public static boolean isBlank(String s) {
 		return s == null || s.isEmpty();
 	}
+	
+	public static boolean isTrimBlank(String s) {
+		return s == null || s.trim().isEmpty();
+	}
 
 	public static boolean isNotBlank(String s) {
 		return !isBlank(s);
+	}
+	
+	public static boolean isNotTrimBlank(String s) {
+		return !isTrimBlank(s);
 	}
 
 }

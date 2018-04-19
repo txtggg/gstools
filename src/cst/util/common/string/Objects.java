@@ -34,10 +34,9 @@ public class Objects {
 		} else {
 			try {
 				String s = o.toString();
-				if (s.length() == 0) {
-					return null;
+				if (s.length() > 0) {
+					i = Integer.valueOf(o.toString());
 				}
-				i = Integer.valueOf(o.toString());
 			} catch (Exception e) {
 			}
 		}
