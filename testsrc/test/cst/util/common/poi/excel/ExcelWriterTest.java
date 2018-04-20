@@ -12,6 +12,11 @@ import cst.util.common.file.Files;
 import cst.util.common.poi.excel.ExcelWriter;
 import cst.util.common.string.Objects;
 
+/**
+ * 测试Excel的写入功能
+ * @author gwc
+ *
+ */
 public class ExcelWriterTest {
 	private static final String path = Objects.getWindowsClassFilePath(ExcelWriterTest.class);
 
