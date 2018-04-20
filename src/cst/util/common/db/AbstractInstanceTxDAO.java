@@ -7,22 +7,13 @@ import javax.sql.DataSource;
 
 /**
  * @author gwc
- * @version v201804 线程事务DAO 同一线程,使用同一事务
+ * @version v201804 实例事务DAO 同一实例,使用同一事务
  */
 public abstract class AbstractInstanceTxDAO extends AbstractDAO {
-	private static DataSource datasource;
 	private Connection conn;
-	private ThreadLocal<Connection> conns = new ThreadLocal<Connection>() {
-		protected Connection initialValue() {
-			 conn = getConnection();
-			try {
-				conn.setAutoCommit(false);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-			return conn;
-		};
-	};
+	public AbstractInstanceTxDAO(){
+		conn = getConnection();
+	}
 	
 	public void rollback(){
 		try {

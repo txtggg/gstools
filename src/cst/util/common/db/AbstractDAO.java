@@ -20,6 +20,12 @@ import cst.gu.util.sql.impl.mysql.MysqlMaker;
  * 应该使用动态代理,处理getter中返回值为bean的对象
  */
 public abstract class AbstractDAO {
+	Connection conn;
+	/**
+	 * 如果是null,代表使用默认的字符集
+	 * @return
+	 */
+	protected abstract String charset();
 
 	protected abstract Connection getConnection();
 
