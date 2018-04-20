@@ -1,4 +1,4 @@
-package cst.util.common.poi.excel;
+package test.cst.util.common.poi.excel;
 
 
 import java.util.List;
@@ -9,8 +9,11 @@ import org.junit.Test;
 import cst.util.common.containers.Lists;
 import cst.util.common.containers.Maps;
 import cst.util.common.file.Files;
+import cst.util.common.poi.excel.ExcelWriter;
+import cst.util.common.string.Objects;
 
 public class ExcelWriterTest {
+	private static final String path = Objects.getWindowsClassFilePath(ExcelWriterTest.class);
 
 	@SuppressWarnings("unchecked")
 	@Test
@@ -18,7 +21,6 @@ public class ExcelWriterTest {
 		System.out.println("testList2Excel");
 		String xlsname = "testList2Excel.xls";
 		String xlsxname = "testList2Excel.xlsx";
-		String path = "C:\\Users\\gwc\\Desktop\\isemp\\gstooltest\\";
 		List<String> row1 = Lists.newArrayList("s1 row1 col1","s1 row1 col2","s1 row1 col3","中文");
 		List<String> row2 = Lists.newArrayList("s1 row2 col1","s1 row2 col2","s1 row2 col3");
 		List<String> row3 = Lists.newArrayList("s1 row3 col1","s1 row3 col2","s1 row3 col3");
@@ -36,7 +38,6 @@ public class ExcelWriterTest {
 	@Test
 	public void testSetMarkersList() {
 		System.out.println("testSetMarkersList");
-		String path = "C:\\Users\\gwc\\Desktop\\isemp\\gstooltest\\";
 		String xlsnamesucc = "测试setMarkers_成功.xls";
 		String xlsnamefail = "测试setMarkers_失败.xls";
 		String xlsxnamesucc = "测试setMarkers_成功.xlsx";
@@ -84,7 +85,6 @@ public class ExcelWriterTest {
 	@Test
 	public void testSetMarkersMap() {
 		System.out.println("testSetMarkersMap");
-		String path = "C:\\Users\\gwc\\Desktop\\isemp\\gstooltest\\";
 		String xlsnamesucc = "测试setMarkers_成功.xls";
 		String xlsnamefail = "测试setMarkers_失败.xls";
 		String xlsxnamesucc = "测试setMarkers_成功.xlsx";

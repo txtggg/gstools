@@ -25,11 +25,7 @@ public class MainTest {
 	private static final String markerReg1 = "\\$\\{.*..*\\}";
 	private static final String markerReg2 = "\\$\\{.*\\}";
 	public static void main(String[] args) { 
-		DecimalFormat format = new DecimalFormat("#0");
-		int a = 5;
-		double b = 13;
-		double c = a/b;
-		System.out.println(format.format(c));
+		System.out.println(Strings.getWindowsClassFilePath(MainTest.class));;
 	}
 
 	public static void ts() {

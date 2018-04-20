@@ -6,10 +6,18 @@ public class Objects {
 
 	Objects() {
 	}
+	
+	/**
+	 * 获取windows下指定class文件的所在路径
+	 * @return
+	 */
+	public static String getWindowsClassFilePath(Class<?> clz) {
+		String path = clz.getResource ("").getFile ();
+		return path.substring(1);
+	}
 
 	/**
 	 * 获取windows classpath
-	 * 
 	 * @return
 	 */
 	public static String getWindowsClassPath() {
