@@ -85,6 +85,14 @@ public class Files {
 		}
 		throw new RuntimeException("文件和信息必须都不为null");
 	}
+	
+	public static boolean writeInfo(String fileFullName, byte[] info) {
+		return writeInfo(new File(fileFullName),info);
+	}
+	
+	public static boolean writeInfo(String fileFullName, String info) {
+		return writeInfo(new File(fileFullName),info);
+	}
 
 	public static byte[] getByte(File file) {
 		if (file == null || !file.exists()) {
