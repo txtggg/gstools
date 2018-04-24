@@ -1,11 +1,8 @@
 package cst.util.common.string;
 
 import java.sql.Blob;
-import java.text.ParseException;
-
 import javax.sql.rowset.serial.SerialBlob;
 
-import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.object.Objects;
 
 public abstract class Strings extends Objects {

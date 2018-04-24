@@ -268,7 +268,7 @@ public final class ExcelWriter {
 					String mapKey = marker[1];
 					if (listKey == null) {
 						if (mapKey != null) {
-							cell.setCellValue(Strings.toString(sheetInfo.get(mapKey)));
+							cell.setCellValue(Strings.getString(sheetInfo.get(mapKey)));
 						}
 					} else {
 						if (rowKey == null) {
@@ -293,7 +293,7 @@ public final class ExcelWriter {
 			} else {
 				Map<String, Object> map0 = listInfo.get(0);
 				for (Entry<Integer, String> e : keyMap.entrySet()) {
-					row.getCell(e.getKey()).setCellValue(Strings.toString(map0.get(e.getValue())));
+					row.getCell(e.getKey()).setCellValue(Strings.getString(map0.get(e.getValue())));
 				}
 				int r = row.getRowNum();
 				for (int x = 1, s = listInfo.size(); x < s; x++) {
@@ -305,7 +305,7 @@ public final class ExcelWriter {
 						if (cell == null) {
 							cell = rowx.createCell(cellNum);
 						}
-						cell.setCellValue(Strings.toString(map.get(e.getValue())));
+						cell.setCellValue(Strings.getString(map.get(e.getValue())));
 					}
 
 				}
