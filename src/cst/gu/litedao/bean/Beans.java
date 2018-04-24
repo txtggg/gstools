@@ -7,6 +7,7 @@ import java.util.Map;
  * @version v201804
  */
 public final class Beans {
+	private Beans(){}
 
 	public static void of(Map<String, Object> map) {
 
