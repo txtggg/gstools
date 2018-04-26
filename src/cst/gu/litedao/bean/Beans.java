@@ -10,7 +10,7 @@ public final class Beans {
 	private Beans(){}
 
 	public static void of(Map<String, Object> map) {
-
+		
 	}
 
 	public static <T> T newBean(Object id, Class<T> clz) {
