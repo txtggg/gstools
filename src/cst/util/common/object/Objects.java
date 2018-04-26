@@ -53,6 +53,8 @@ public class Objects {
 	 * @param o
 	 * @return
 	 * @deprecated
+	 * @see getInteger
+	 * 删除时间v2019
 	 */
 	public static Integer toInteger(Object o) {
 		return getInteger(o);

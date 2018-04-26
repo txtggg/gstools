@@ -2,16 +2,19 @@ package cst.gu.util.annotation;
 
 import java.lang.reflect.Field;
 
+import cst.gu.litedao.bean.BeanAnnotations;
+
 /**
  * @author guweichao 20170410
- * 
+ * @deprecated
+ * @see BeanAnnotations
  */
 public class AnnoUtil {
 	private AnnoUtil() {
 	} // 静态util 不对外提供实例
 
 
-	public static <T> String getColumnValue(Field field) {
+	public static String getColumnValue(Field field) {
 		Column c = field.getAnnotation(Column.class);
 		if (c == null) {
 			return null;

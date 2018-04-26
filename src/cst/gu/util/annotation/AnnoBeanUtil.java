@@ -2,9 +2,12 @@ package cst.gu.util.annotation;
 
 import java.lang.reflect.Field;
 
+import cst.gu.litedao.bean.BeanAnnotations;
+
 /**
  * @author guweichao 20170410
- * 
+ * @deprecated
+ * @see BeanAnnotations
  */
 public class AnnoBeanUtil {
 	private AnnoBeanUtil() {

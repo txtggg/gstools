@@ -3,7 +3,6 @@ package cst.util.common.db;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import javax.sql.DataSource;
 
 /**
  * @author gwc
