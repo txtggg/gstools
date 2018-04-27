@@ -6,29 +6,25 @@ import cst.gu.util.clazz.ClassUtil;
 import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.string.Strings;
 
+/**
+ * 
+ * @author gwc
+ * @version v20180427:更新getInteger方法,添加getInt方法
+ */
 public class Objects {
 
 	protected Objects() {
 	}
 
 	/**
-	 * 获取windows下指定class文件的所在路径
 	 * 
+	 * @param o
 	 * @return
+	 * @deprecated
+	 * @see getInteger 删除时间v2019
 	 */
-	public static String getWindowsClassFilePath(Class<?> clz) {
-		String path = clz.getResource("").getFile();
-		return path.substring(1);
-	}
-
-	/**
-	 * 获取windows classpath
-	 * 
-	 * @return
-	 */
-	public static String getWindowsClassPath() {
-		String path = ClassUtil.class.getClassLoader().getResource("").getPath();
-		return path.substring(1);
+	public static Integer toInteger(Object o) {
+		return getInteger(o);
 	}
 
 	/**
@@ -41,42 +37,132 @@ public class Objects {
 		return getString(o);
 	}
 
+	/**
+	 * @author gwc 当传入null值时,无论o的类型为何,一律返回Integer null 当传入Integer,返回自身
+	 *         当传入Number,返回intValue() 其他类型,转为String之后使用Integer解析. ""解析为null而不是0
+	 * @param o
+	 * @return
+	 * @exception 可能发生numberFormatException
+	 */
+	public static Integer getInteger(Object o) {
+		if (o == null) {
+			return null;
+		} else if (o instanceof Integer) {
+			return (Integer) o;
+		} else if (o instanceof Number) {
+			return ((Number) o).intValue();
+		}
+		String s = o.toString().trim();
+		if (s.length() == 0) {
+			return null;
+		}
+		return Integer.valueOf(s);
+	}
+
+	/**
+	 * 尝试调用getInteger方法解析对象,如果发生异常,print异常后,返回
+	 * 
+	 * @param o
+	 * @return
+	 */
+	public static Integer tryGetInteger(Object o) {
+		Integer i = null;
+		try {
+			i = getInteger(o);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return i;
+	}
+
+
+	/**
+	 * 当传入null值时,无论o的类型为何,一律返回Integer null 当传入Integer,返回自身
+	 * 当传入Number,返回longValue() 其他类型,转为String之后使用Long解析, ""解析为null而不是0
+	 * 
+	 * @param o
+	 * @return
+	 * @exception 可能发生numberFormatException
+	 */
+	public static Long getLong(Object o) {
+		if (o == null) {
+			return null;
+		} else if (o instanceof Integer) {
+			return (Long) o;
+		} else if (o instanceof Number) {
+			return ((Number) o).longValue();
+		}
+		String s = o.toString().trim();
+		if (s.length() == 0) {
+			return null;
+		}
+		return Long.valueOf(s);
+	}
+	
+	/**
+	 * 尝试解析为Long,;如果发生异常,则print并返回null
+	 * @param o
+	 * @return
+	 */
+	public static Long tryGetLong(Object o){
+		Long l = null;
+		try {
+			l = getLong(o);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return l;
+	}
+	
+	public static Double getDouble(Object o){
+		if (o == null) {
+			return null;
+		} else if (o instanceof Integer) {
+			return (Double) o;
+		} else if (o instanceof Number) {
+			return ((Number) o).doubleValue();
+		}
+		String s = o.toString().trim();
+		if (s.length() == 0) {
+			return null;
+		}
+		return Double.valueOf(s);
+	}
+	
+	public static Double tryGetDouble(Object o){
+		Double d = null;
+		try {
+			d = getDouble(o);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return d;
+	}
+	
+
+	/**
+	 * 获取windows下指定class文件的所在路径
+	 * @return
+	 */
+	public static String getWindowsClassFilePath(Class<?> clz) {
+		String path = clz.getResource("").getFile();
+		return path.substring(1);
+	}
+
+	/**
+	 * 获取windows classpath
+	 * @return
+	 */
+	public static String getWindowsClassPath() {
+		String path = ClassUtil.class.getClassLoader().getResource("").getPath();
+		return path.substring(1);
+	}
+
 	public static String getString(Object o) {
 		if (o == null) {
 			return "";
 		}
 		return o.toString();
-	}
-
-	/**
-	 * 
-	 * @param o
-	 * @return
-	 * @deprecated
-	 * @see getInteger
-	 * 删除时间v2019
-	 */
-	public static Integer toInteger(Object o) {
-		return getInteger(o);
-	}
-
-	public static Integer getInteger(Object o) {
-		if (o == null) {
-			return null;
-		}
-		Integer i = null;
-		if (o instanceof Integer) {
-			i = (Integer) o;
-		} else {
-			try {
-				String s = o.toString();
-				if (s.length() > 0) {
-					i = Integer.valueOf(o.toString());
-				}
-			} catch (Exception e) {
-			}
-		}
-		return i;
 	}
 
 	/**

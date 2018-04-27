@@ -79,6 +79,7 @@ public abstract class Strings extends Objects {
 		}
 		return null;
 	}
+	
 
 	/**
 	 * 
