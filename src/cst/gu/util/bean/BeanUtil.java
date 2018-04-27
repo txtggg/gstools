@@ -124,7 +124,13 @@ public final class BeanUtil {
 								v = StringUtil.string2ObjectWithAnno(field.getType(), v.toString());
 							}
 						}
-						field.set(bean, v);
+						if(v == null){
+							field.set(bean, null);
+						}else{
+							if(field.getType().getName().equals(v.getClass().getName())){
+								field.set(bean, v);
+							}
+						}
 					}
 				} catch (Exception e) {
 					LoggerUtil.errorLog(e);
