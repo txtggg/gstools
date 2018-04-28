@@ -13,8 +13,7 @@ import cst.util.common.string.Strings;
  */
 public class Objects {
 
-	protected Objects() {
-	}
+	protected Objects() {}
 
 	/**
 	 * 

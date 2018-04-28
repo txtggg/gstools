@@ -29,11 +29,11 @@ public abstract class SoftRefCache<K, V> {
 	}
 
 	public V get(K k) {
-		SoftReference<V> sv = map.get(k);
-		if (sv == null) {
+		SoftReference<V> srv = map.get(k);
+		if (srv == null) {
 			return null;
 		}
-		V v = sv.get();
+		V v = srv.get();
 		return v;
 
 	}

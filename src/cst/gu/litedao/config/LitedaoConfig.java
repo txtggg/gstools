@@ -6,6 +6,21 @@ package cst.gu.litedao.config;
  */
 public abstract class LitedaoConfig {
 	private static String defaultCharset = null;
-	private static int cache = 0;
+	private static boolean cache = false;
 	
+	public static void setCharset(String charset){
+		defaultCharset = charset;
+	}
+	
+	public static String charset(){
+		return defaultCharset;
+	}
+
+	public static void setCache(boolean useCache){
+		cache = useCache;
+	}
+	
+	public static boolean useCache(){
+		return cache;
+	}
 }
