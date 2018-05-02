@@ -86,7 +86,6 @@ public class IpMacUtil {
 				InputStreamReader isr = new InputStreamReader(p.getInputStream(),Charset.forName("GBK"));
 				BufferedReader br = new BufferedReader(isr);
 				while ((line = br.readLine()) != null) {
-					if (line != null) {
 						for(String macPrefix : macPrefixes){
 							int index = line.indexOf(macPrefix);
 							if (index != -1) {
@@ -94,7 +93,6 @@ public class IpMacUtil {
 								break;
 							}
 						}
-					}
 				}
 				br.close();
 			} catch (IOException e) {

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @author gwc
@@ -15,20 +14,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * @param <K>
  */
 public abstract class SoftRefCache<K, V> {
-	private Map<K, SoftReference<V>> map = new ConcurrentHashMap<K, SoftReference<V>>();
+	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
 
 	/**
 	 * null对象不会被缓存
 	 * @param k
 	 * @param v
 	 */
-	public void put(K k, V v) {
+	 void put(K k, V v) {
 		if (v != null) {
 			map.put(k, new SoftReference<V>(v));
 		}
 	}
 
-	public V get(K k) {
+	 V get(K k) {
 		SoftReference<V> srv = map.get(k);
 		if (srv == null) {
 			return null;
@@ -38,15 +37,15 @@ public abstract class SoftRefCache<K, V> {
 
 	}
 
-	public void remove(K k) {
+	 void remove(K k) {
 		map.remove(k);
 	}
 
-	public void clearAll() {
+	 void clearAll() {
 		map.clear();
 	}
 
-	public void clearNull() {
+	 void clearNull() {
 		Set<K> nullKey = new HashSet<K>();
 		Set<Entry<K, SoftReference<V>>> entrys = map.entrySet();
 		for(Entry<K, SoftReference<V>> e :entrys){
@@ -64,5 +63,16 @@ public abstract class SoftRefCache<K, V> {
 			map.remove(k);
 		}
 	}
-
+	 
+	 /**
+	  * 清理多余的空间
+	  * 释放已被map移除,但仍然存在于原始数组中的数据
+	  */
+	 void trim(){
+		 Map<K, SoftReference<V>> map1 = Maps.newConcurrentHashMap();
+		 map1.putAll(map);
+		 map = map1;
+	 }
+	
+	
 }

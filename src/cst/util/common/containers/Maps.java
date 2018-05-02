@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cst.gu.litedao.bean.Beans;
 import cst.gu.util.sql.test.LoggerUtil;
@@ -19,13 +20,21 @@ import cst.gu.util.string.StringUtil;
  * @version 18.3
  */
 public class Maps {
+	
+	public static <K, V> ConcurrentHashMap<K,V> newConcurrentHashMap(){
+		return new ConcurrentHashMap<K, V>();
+	}
+	
+	public static <K, V> ConcurrentHashMap<K,V> newConcurrentHashMap(int initSize){
+		return new ConcurrentHashMap<K, V>(initSize);
+	}
 
 	public static <K, V> HashMap<K,V> newHashMap(){
 		return new HashMap<K, V>();
 	}
 	
-	public static <K, V> HashMap<K,V> newHashMapSized(int size){
-		return new HashMap<K, V>(size);
+	public static <K, V> HashMap<K,V> newHashMapSized(int initSize){
+		return new HashMap<K, V>(initSize);
 	}
 	
 	/**
@@ -108,8 +117,7 @@ public class Maps {
 		for (Field field : fields) {
 			field.setAccessible(true);
 			if(!Modifier.isStatic(field.getModifiers())){// 注入非静态资源
-				try { // 本方法中传入bean,不会出现IllegalArgumentException ;
-					// field.setAccessible(true),不会出现IllegalAccessException
+				try {
 					String fieldName = field.getName();
 					if(map.containsKey(fieldName)){
 						Object v = map.get(fieldName);
@@ -128,7 +136,7 @@ public class Maps {
 						field.set(bean, v);
 					}
 				} catch (Exception e) {
-					LoggerUtil.errorLog(e);
+					throw new RuntimeException(e);
 				}
 				
 			}
