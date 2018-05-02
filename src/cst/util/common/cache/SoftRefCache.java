@@ -1,10 +1,12 @@
-package cst.util.common.containers;
+package cst.util.common.cache;
 
 import java.lang.ref.SoftReference;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
+import cst.util.common.containers.Maps;
 
 /**
  * @author gwc
