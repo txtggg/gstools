@@ -19,6 +19,22 @@ public final class Lists {
 		return new ArrayList<T>();
 	}
 	
+	@SuppressWarnings("unchecked")
+	public static <T> List<T> trim(List<T> list){
+		List<T> rl = null;
+		if(list instanceof ArrayList ){
+			rl = newArrayListSized(list.size());
+		}else{
+			try {
+				rl = list.getClass().newInstance();
+			} catch ( Exception e) {
+				e.printStackTrace();
+			}  
+		}
+		rl.addAll(list);
+		return rl;
+	}
+	
 	/**
 	 * 返回一个arraylist
 	 * 将指定初始值放入
