@@ -15,7 +15,7 @@ import cst.util.common.containers.Sets;
  * @param <V>
  * @param <K>
  */
-public class TimeLimitSoftRefCache<K, V> implements SoftRefCache<K, V> {
+public class TimedSoftRefCache<K, V> implements SoftRefCache<K, V> {
 	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
 	private Map<K, Long> keyTimes = Maps.newConcurrentHashMap();// 缓存的时间
 
@@ -77,7 +77,8 @@ public class TimeLimitSoftRefCache<K, V> implements SoftRefCache<K, V> {
 					nullKey.add(k);
 				} else {
 					if (overTime > 0) {
-						if (keyTimes.get(k) > over) {
+						Long kt = keyTimes.get(k);
+						if (kt != null && kt > over) {
 							nullKey.add(k);
 						}
 					}
@@ -104,9 +105,9 @@ public class TimeLimitSoftRefCache<K, V> implements SoftRefCache<K, V> {
 				while (cm == countMod) {
 					try {
 						System.out.println("countMod:" + countMod);
-						if (overTime > 0 ) {
-							Thread.sleep(overTime/2);
-							if(cm == countMod){
+						if (overTime > 0) {
+							Thread.sleep(overTime / 2);
+							if (cm == countMod) {
 								System.out.println("执行trim操作");
 								trim();
 							}
@@ -115,8 +116,8 @@ public class TimeLimitSoftRefCache<K, V> implements SoftRefCache<K, V> {
 						e.printStackTrace();
 					}
 				}
-				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:"+cm);
-				System.out.println("cm != countMod,结束本设置的trim,对应的overTime为:"+ovt);
+				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:" + cm);
+				System.out.println("cm != countMod,结束本设置的trim,对应的overTime为:" + ovt);
 			}
 		}
 		ThRunner tr = new ThRunner();
@@ -126,21 +127,23 @@ public class TimeLimitSoftRefCache<K, V> implements SoftRefCache<K, V> {
 
 	/**
 	 * 设置失效时间 当设置为<=0时,不超时
+	 * 
 	 * @param overTime:分
 	 * @return
 	 */
 	public void setOverTime(int overTime) {
 		System.out.println("设置超时时间为:" + overTime + "min");
-		this.overTime = overTime * 60 *1000;
+		this.overTime = overTime * 60 * 1000;
 		backTrim(++countMod);
 	}
 
 	/**
 	 * 获取当前设置的失效时间
+	 * 
 	 * @param overTime:分
 	 * @return
 	 */
 	public int getOverTime() {
-		return overTime/60/1000;
+		return overTime / 60 / 1000;
 	}
 }
