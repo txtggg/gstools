@@ -1,9 +1,9 @@
 package cst.util.common.test;
 
-import java.lang.instrument.Instrumentation;
 import java.util.List;
 import java.util.Map;
 
+import cst.util.common.cache.softref.TimeLimitSoftRefCache;
 import cst.util.common.containers.Lists;
 import cst.util.common.containers.Maps;
 
@@ -16,12 +16,17 @@ import cst.util.common.containers.Maps;
 public class Gutest<K, V> {
 	
 	public static void main(String[] args) throws InterruptedException{
-		Map<String,Object> map = Maps.newHashMap();
-		map.put("ddd", "dddd");
-		map.put("ddd1", "dddd");
-		map.put("ddd2", "dddd");
-		testRef(map);
-		System.out.println(map);
+		TimeLimitSoftRefCache<String, String> tsrf = new TimeLimitSoftRefCache<String, String>();
+		int s = 1000;
+		tsrf.setOverTime(30);
+		for(int i = 100;i<s;i++){
+			for(int x =0;x<s;x++){
+				String ks = String.valueOf(x);
+				tsrf.put(ks,ks);
+			}
+		}
+		System.out.println("gutest执行完成,缓存后台trim中");
+		
 	}
 	
 	public static void testRef(Map<String,Object> map){

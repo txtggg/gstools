@@ -23,13 +23,7 @@ public class NumberLimitSoftRefCache<K,V> implements SoftRefCache<K,V>{
 	}
 
 	@Override
-	public void remove(K k) {
-		// TODO 自动生成的方法存根
-		
-	}
-
-	@Override
-	public void clearAll() {
+	public void clear() {
 		// TODO 自动生成的方法存根
 		
 	}

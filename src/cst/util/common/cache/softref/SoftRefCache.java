@@ -8,21 +8,17 @@ package cst.util.common.cache.softref;
  */
 public interface SoftRefCache<K, V> {
 	/**
-	 * null对象不会被缓存
-	 * 
 	 * @param k
-	 * @param v
+	 * @param v,当存入null时,移除对应的缓存
 	 */
 	void put(K k, V v);
 
 	V get(K k);
 
-	void remove(K k);
-
-	void clearAll();
+	void clear();
 
 	/**
-	 * 清理多余的空间:移除已失效的缓存,并释放已被map移除,但仍然存在于原始数组中的数据
+	 * 清理多余的空间:从map中移除已失效的缓存,并释放map多次扩容收缩导致的多占用的空间
 	 */
 	void trim();
 }
