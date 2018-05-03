@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.containers.Maps;
 import cst.util.common.containers.Sets;
 
@@ -15,7 +16,7 @@ import cst.util.common.containers.Sets;
  * @param <V>
  * @param <K>
  */
-public class TimedSoftRefCache<K, V> implements SoftRefCache<K, V> {
+public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
 	private Map<K, Long> keyTimes = Maps.newConcurrentHashMap();// 缓存的时间
 
@@ -93,7 +94,6 @@ public class TimedSoftRefCache<K, V> implements SoftRefCache<K, V> {
 
 	/**
 	 * 多线程后台开始trim
-	 * 
 	 * @param countMod
 	 */
 	private void backTrim(int ctmod) {
@@ -108,7 +108,7 @@ public class TimedSoftRefCache<K, V> implements SoftRefCache<K, V> {
 						if (overTime > 0) {
 							Thread.sleep(overTime / 2);
 							if (cm == countMod) {
-								System.out.println("执行trim操作");
+								System.out.println("执行trim操作,countMod:"+cm+",时间:"+LocalDateUtil.getNow());
 								trim();
 							}
 						}
@@ -116,8 +116,8 @@ public class TimedSoftRefCache<K, V> implements SoftRefCache<K, V> {
 						e.printStackTrace();
 					}
 				}
-				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:" + cm);
-				System.out.println("cm != countMod,结束本设置的trim,对应的overTime为:" + ovt);
+				System.out.println(LocalDateUtil.getNow());
+				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:" + cm+",对应的overTime为:" + ovt);
 			}
 		}
 		ThRunner tr = new ThRunner();

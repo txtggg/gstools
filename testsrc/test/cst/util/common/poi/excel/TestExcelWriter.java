@@ -18,8 +18,8 @@ import cst.util.common.poi.excel.ExcelWriter;
  * @author gwc
  *
  */
-public class ExcelWriterTest {
-	private static final String path = Objects.getWindowsClassFilePath(ExcelWriterTest.class);
+public class TestExcelWriter {
+	private static final String path = Objects.getWindowsClassFilePath(TestExcelWriter.class);
 
 	@SuppressWarnings("unchecked")
 	@Test

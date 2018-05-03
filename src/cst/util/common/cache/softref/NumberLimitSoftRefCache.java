@@ -8,7 +8,7 @@ package cst.util.common.cache.softref;
  * @param <V>
  * @param <K>
  */
-public class NumberLimitSoftRefCache<K,V> implements SoftRefCache<K,V>{
+public class NumberLimitSoftRefCache<K,V> implements ISoftRefCache<K,V>{
 
 	@Override
 	public void put(K k, V v) {
