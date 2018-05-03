@@ -26,7 +26,7 @@ public class Maps {
 			map1 = newConcurrentHashMap(map.size());
 		} else if (map instanceof HashMap) {
 			map1 = newHashMapSized(map.size());
-		}else{
+		} else {
 			try {
 				map1 = map.getClass().newInstance();
 			} catch (Exception e) {

@@ -16,7 +16,7 @@ public class TestTimedSoftRefCache<K, V> {
 	
 	@Test
 	public void testBackTrim() {
-		TimedSoftRefCache<String, String> tsrf = new TimedSoftRefCache<String, String>();
+		TimedSoftRefCache<String, String> tsrf = TimedSoftRefCache.newPutTimedInstance();
 		int s = 1000;
 		for(int i = 100;i<s;i++){
 			for(int x =0;x<s;x++){

@@ -17,19 +17,38 @@ import cst.util.common.containers.Sets;
  * @param <K>
  */
 public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
-	
-	public static <K, V> TimedSoftRefCache<K, V> getInstance(){
-		return new TimedSoftRefCache<K, V>();
-	}
+
 	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
 	private Map<K, Long> keyTimes = Maps.newConcurrentHashMap();// 缓存的时间
 
 	private int overTime = 0;
 	private int countMod = 0;
+	private boolean putTimed ;
 
-	public int size(){
+	private TimedSoftRefCache(boolean putTimed) {
+		this.putTimed = putTimed;
+	}
+
+	/**
+	 * 超时限制类型为put时间
+	 * @return
+	 */
+	public static <K, V> TimedSoftRefCache<K, V> newPutTimedInstance() {
+		return new TimedSoftRefCache<K, V>(true);
+	}
+
+	/**
+	 * 超时限制类型为get时间(上一次访问)
+	 * @return
+	 */
+	public static <K, V> TimedSoftRefCache<K, V> newGetTimedInstance() {
+		return new TimedSoftRefCache<K, V>(false);
+	}
+
+	public int size() {
 		return map.size();
 	}
+
 	/**
 	 * 使用put(k,null)可以移除缓存
 	 */
@@ -49,7 +68,11 @@ public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 		if (sv == null) {
 			return null;
 		}
-		return sv.get();
+		V v = sv.get();
+		if (!putTimed && v != null) {
+			keyTimes.put(k, System.currentTimeMillis() / 1000);
+		}
+		return v;
 	}
 
 	private void remove(K k) {
