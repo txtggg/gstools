@@ -1,4 +1,4 @@
-package cst.util.common.cache;
+package cst.util.common.cache.softref;
 
 /**
  * @author gwc

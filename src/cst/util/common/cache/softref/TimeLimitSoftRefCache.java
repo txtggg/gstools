@@ -1,4 +1,4 @@
-package cst.util.common.cache;
+package cst.util.common.cache.softref;
 
 import java.lang.ref.SoftReference;
 import java.util.Map;
