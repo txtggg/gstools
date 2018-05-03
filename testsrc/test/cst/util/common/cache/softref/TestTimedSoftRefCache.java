@@ -26,6 +26,7 @@ public class TestTimedSoftRefCache<K, V> {
 		}
 		for(int i = 1;i<s;i++){
 			try {
+				System.out.println("tsrc的size:"+tsrf.size());
 				tsrf.setOverTime(i);
 				Thread.sleep(i*1000*60*10);
 			} catch (InterruptedException e) {

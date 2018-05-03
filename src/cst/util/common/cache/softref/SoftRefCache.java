@@ -16,8 +16,14 @@ import cst.util.common.containers.Sets;
  * @param <K>
  */
 public class SoftRefCache<K, V> implements ISoftRefCache<K, V> {
+	public static <K, V> SoftRefCache<K, V> getInstance(){
+		return new SoftRefCache<K, V>();
+	}
 	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
-
+	
+	public int size(){
+		return map.size();
+	}
 	/**
 	 * 使用put(k,null)可以移除缓存
 	 */
