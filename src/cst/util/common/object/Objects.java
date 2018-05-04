@@ -12,15 +12,22 @@ import cst.util.common.string.Strings;
  * @version v20180427:更新getInteger方法,添加getInt方法
  */
 public class Objects {
+	
+	
 
 	protected Objects() {}
+	
+	
+	public static boolean equals(Object o1, Object o2) {
+		return o1 == o2 || (o1 != null && o1.equals(o2));
+	}
 
 	/**
 	 * 
 	 * @param o
 	 * @return
 	 * @deprecated
-	 * @see getInteger 删除时间v2019
+	 * @see getInteger 删除时间v2019.04
 	 */
 	public static Integer toInteger(Object o) {
 		return getInteger(o);
@@ -206,12 +213,7 @@ public class Objects {
 		} else if (className.equals("boolean") || className.equals("java.lang.Boolean")) {
 			rt = Boolean.valueOf(valueS);
 		} else if (className.equals("java.sql.Blob")) {
-			if (charset == null) {
-				rt = Strings.getBlob(valueS);
-
-			} else {
 				rt = Strings.getBlob(valueS, charset);
-			}
 		} else if (className.equals("java.sql.Date")) {
 			try {
 				rt = new java.sql.Date(LocalDateUtil.tryParseDate(valueS).getTime());

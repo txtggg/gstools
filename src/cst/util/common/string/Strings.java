@@ -9,14 +9,32 @@ public abstract class Strings extends Objects {
 	Strings() {
 	}
 
+	
+	/**
+	 * 忽略空对象,比较String:(null和""视为相等)
+	 * @return
+	 */
+	public static boolean equalsIgnoreBlank(String s1,String s2){
+		return (isBlank(s1) && isBlank(s2)) || (isNotBlank(s1) && isNotBlank(s2));
+	}
+	
+	
+	/**
+	 * 忽略空对象,比较String:(null和trim之后为""视为相等)
+	 * @return
+	 */
+	public static boolean equalsIgnoreTrimBlank(String s1,String s2){
+		return (isTrimBlank(s1) && isTrimBlank(s2)) || (isNotTrimBlank(s1) && isNotTrimBlank(s2));
+	}
 	/**
 	 * 获取正则中有特殊含义的字符
 	 * 
 	 * @return
 	 */
 	public static String[] getRegSpecial() {
+		
 		String[] regs = { "\\", "$", "(", ")", "*", "+", ".", "[", "]", "?", "^", "{", "}", "|" };
-		return regs;
+		return regs; 
 	}
 
 	/**
@@ -32,7 +50,7 @@ public abstract class Strings extends Objects {
 			for (String key : regSpecial) {
 				boolean chg = true;
 				for (String wo : without) {
-					if (wo.equals(key)) {
+					if (wo.equals(key)) { 
 						chg = false;
 						break;
 					}
@@ -69,10 +87,15 @@ public abstract class Strings extends Objects {
 	 * @throws Exception
 	 */
 	public static Blob getBlob(String str, String charsetName) {
-
 		if (!isBlank(str)) {
 			try {
-				return new SerialBlob(str.getBytes(charsetName));
+				byte[] bytes = null;
+				if(isBlank(charsetName)){
+					bytes = str.getBytes();
+				}else{
+					bytes = str.getBytes(charsetName);
+				}
+				return new SerialBlob(bytes);
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

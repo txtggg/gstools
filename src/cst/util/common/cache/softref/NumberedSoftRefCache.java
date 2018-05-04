@@ -46,7 +46,7 @@ public class NumberedSoftRefCache<K,V> implements ISoftRefCache<K,V>{
 
 	private Map<K, SoftReference<V>> initMap(){
 		Map<K, SoftReference<V>> map1 = new LinkedHashMap<K, SoftReference<V>>(){
-			private static final long serialVersionUID = 1L;
+			private static final long serialVersionUID = 101L;
 
 			protected boolean removeEldestEntry(Map.Entry<K, SoftReference<V>> eldest) {
 				if(maxSize > 0 && this.size() > maxSize){
