@@ -22,6 +22,7 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 	// (因为map扩容后再删除,他占用的空间不会收缩)
 	private static final int trimRate = 2;
 	private static final int trimSize = 1024;
+	private static final int timeNumber = 60 * 1000;// 时间转换系数,从系统的ms转换为设置的时间minite
 	private int maxSize = 0;
 	private Map<K, SoftReference<V>> map = Maps.newConcurrentHashMap();
 	private Map<K, Long> keyTimes = initKeyTimeMap();
@@ -170,7 +171,7 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 	 */
 	public void setOverTime(int overTime) {
 		System.out.println("设置超时时间为:" + overTime + "min");
-		this.overTime = overTime * 60 * 1000;
+		this.overTime = overTime * timeNumber;
 		backTrim(++countMod);
 	}
 
@@ -181,6 +182,6 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 	 * @return
 	 */
 	public int getOverTime() {
-		return overTime / 60 / 1000;
+		return overTime / timeNumber;
 	}
 }
