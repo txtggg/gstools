@@ -93,7 +93,7 @@ public class Objects {
 	public static Long getLong(Object o) {
 		if (o == null) {
 			return null;
-		} else if (o instanceof Integer) {
+		} else if (o instanceof Long) {
 			return (Long) o;
 		} else if (o instanceof Number) {
 			return ((Number) o).longValue();
@@ -106,7 +106,7 @@ public class Objects {
 	}
 	
 	/**
-	 * 尝试解析为Long,;如果发生异常,则print并返回null
+	 * 尝试解析为Long,如果发生异常,则print并返回null
 	 * @param o
 	 * @return
 	 */
@@ -123,7 +123,7 @@ public class Objects {
 	public static Double getDouble(Object o){
 		if (o == null) {
 			return null;
-		} else if (o instanceof Integer) {
+		} else if (o instanceof Double) {
 			return (Double) o;
 		} else if (o instanceof Number) {
 			return ((Number) o).doubleValue();

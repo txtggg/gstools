@@ -15,7 +15,7 @@ public abstract class Strings extends Objects {
 	 * @return
 	 */
 	public static boolean equalsIgnoreBlank(String s1,String s2){
-		return (isBlank(s1) && isBlank(s2)) || (isNotBlank(s1) && isNotBlank(s2));
+		return (isBlank(s1) == isBlank(s2)) || (isNotBlank(s1) == isNotBlank(s2));
 	}
 	
 	
@@ -24,7 +24,7 @@ public abstract class Strings extends Objects {
 	 * @return
 	 */
 	public static boolean equalsIgnoreTrimBlank(String s1,String s2){
-		return (isTrimBlank(s1) && isTrimBlank(s2)) || (isNotTrimBlank(s1) && isNotTrimBlank(s2));
+		return (isTrimBlank(s1) == isTrimBlank(s2)) || (isNotTrimBlank(s1) == isNotTrimBlank(s2));
 	}
 	/**
 	 * 获取正则中有特殊含义的字符
