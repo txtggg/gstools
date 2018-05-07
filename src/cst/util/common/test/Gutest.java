@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import cst.util.common.cache.softref.TimedSoftRefCache;
+import cst.util.common.cache.softref.TimedSoftRefCache2;
 import cst.util.common.containers.Lists;
 import cst.util.common.containers.Maps;
 

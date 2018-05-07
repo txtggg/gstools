@@ -12,7 +12,7 @@ import cst.util.common.cache.softref.TimedSoftRefCache2;
  * @param <V>
  * @param <K>
  */
-public class TestTimedSoftRefCache<K, V> { 
+public class TestTimedSoftRefCache2<K, V> { 
 	
 	@Test
 	public void testBackTrim() {
