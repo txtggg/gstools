@@ -2,6 +2,7 @@ package cst.util.common.cache.softref;
 
 /**
  * @author gwc
+ * 软引用缓存,避免内存溢出
  * @version 18.4 因为使用的软引用,null对象不会被缓存
  * @param <V>
  * @param <K>

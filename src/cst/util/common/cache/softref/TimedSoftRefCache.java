@@ -5,14 +5,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.containers.Maps;
 import cst.util.common.containers.Sets;
 
 /**
  * @author gwc
+ * 使用后台线程进行trim操作,获取实例时可选择根据put或get时间来定义超时时间
  * @version 18.5 带时间限制的软引用缓存:超过指定时间(单位:分)或软引用失效都会导致清理缓存
  * 
+ * @see TimedSoftRefCache2
  * @param <V>
  * @param <K>
  */
@@ -86,6 +87,9 @@ public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 		keyTimes.clear();
 	}
 
+	/**
+	 * 执行trim操作,移除无效的缓存,并缩减map的容量以减少内存占用
+	 */
 	@Override
 	public void trim() {
 		clearllegal();
@@ -128,17 +132,14 @@ public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 	 */
 	private void backTrim(int ctmod) {
 		final int cm = ctmod;
-		final int ovt = getOverTime();
 		class ThRunner implements Runnable {
 			@Override
 			public void run() {
 				while (cm == countMod) {
 					try {
-						System.out.println("countMod:" + countMod);
 						if (overTime > 0) {
 							Thread.sleep(overTime / 2);
 							if (cm == countMod) {
-								System.out.println("执行trim操作,countMod:" + cm + ",时间:" + LocalDateUtil.getNow());
 								trim();
 							}
 						}
@@ -146,8 +147,6 @@ public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 						e.printStackTrace();
 					}
 				}
-				System.out.println(LocalDateUtil.getNow());
-				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:" + cm + ",对应的overTime为:" + ovt);
 			}
 		}
 		ThRunner tr = new ThRunner();
@@ -162,7 +161,6 @@ public class TimedSoftRefCache<K, V> implements ISoftRefCache<K, V> {
 	 * @return
 	 */
 	public void setOverTime(int overTime) {
-		System.out.println("设置超时时间为:" + overTime + "min");
 		this.overTime = overTime * 60 * 1000;
 		backTrim(++countMod);
 	}

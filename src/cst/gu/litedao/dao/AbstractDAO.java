@@ -9,29 +9,19 @@ import java.sql.Statement;
 import java.util.List;
 import java.util.Map;
 
+import cst.gu.litedao.config.LitedaoConfig;
 import cst.gu.util.bean.BeanUtil;
 import cst.gu.util.container.Containers;
 import cst.gu.util.sql.SqlMaker;
 import cst.gu.util.sql.impl.mysql.MysqlMaker;
 
 /**
- * @author guweichao 20171019 hibernate 的事务增强工具 解决hibernate和jdbc事务同时开启的冲突
- *         所有异常已重新包装为runtimeException ,如果需要异常信息 使用try catch 或者throws即可处理异常
- *         应该使用动态代理,处理getter中返回值为bean的对象
+ * @author gwc
+ * @version v2018.05
  */
 public abstract class AbstractDAO {
 	Connection conn;
-
-	/**
-	 * 默认为null:代表不指定字符集
-	 * 如果需要其他字符集,重写此方法
-	 * 如果返回null,代表使用不带字符集参数的方法,由系统默认,则在跨平台或者数据库版本时可能发生不可预期的结果
-	 * 
-	 * @return
-	 */
-	protected String charset() {
-		return null;
-	}
+	private static final String charset = LitedaoConfig.charset();
 
 	protected abstract Connection getConnection();
 

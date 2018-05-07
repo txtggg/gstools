@@ -22,18 +22,15 @@ public class NumberedSoftRefCache<K,V> implements ISoftRefCache<K,V>{
 
 	@Override
 	public void put(K k, V v) {
-		// TODO 自动生成的方法存根
 	}
 
 	@Override
 	public V get(K k) {
-		// TODO 自动生成的方法存根
 		return null;
 	}
 
 	@Override
 	public void clear() {
-		// TODO 自动生成的方法存根
 		
 	}
 

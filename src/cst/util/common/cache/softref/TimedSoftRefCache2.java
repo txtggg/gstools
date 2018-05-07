@@ -6,14 +6,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import cst.gu.util.datetime.LocalDateUtil;
 import cst.util.common.containers.Maps;
 import cst.util.common.containers.Sets;
 
 /**
  * @author gwc
+ * 使用linkedhashmap来保存时间,当缓存map的实际占用容量较大,而当前size较小时,执行trim清理空间
  * @version 18.5 带时间限制的软引用缓存:超过指定时间(单位:分)或软引用失效都会导致清理缓存
- * 
+ * 以最近一次的get或put操作定义超时时间
+ * @see TimedSoftRefCache
  * @param <V>
  * @param <K>
  */
@@ -28,7 +29,6 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 	private Map<K, Long> keyTimes = initKeyTimeMap();
 
 	private int overTime = 0;
-	private int countMod = 0;
 
 	private LinkedHashMap<K, Long> initKeyTimeMap() {
 		return new LinkedHashMap<K, Long>(16, 0.75F, true);
@@ -129,39 +129,6 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 		}
 	}
 
-	/**
-	 * 多线程后台开始trim
-	 * 
-	 * @param countMod
-	 */
-	private void backTrim(int ctmod) {
-		final int cm = ctmod;
-		final int ovt = getOverTime();
-		class ThRunner implements Runnable {
-			@Override
-			public void run() {
-				while (cm == countMod) {
-					try {
-						System.out.println("countMod:" + countMod);
-						if (overTime > 0) {
-							Thread.sleep(overTime / 2);
-							if (cm == countMod) {
-								System.out.println("执行trim操作,countMod:" + cm + ",时间:" + LocalDateUtil.getNow());
-								trim();
-							}
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-				System.out.println(LocalDateUtil.getNow());
-				System.out.println("cm != countMod,结束本设置的trim,对应的countMod为:" + cm + ",对应的overTime为:" + ovt);
-			}
-		}
-		ThRunner tr = new ThRunner();
-		Thread th = new Thread(tr);
-		th.start();
-	}
 
 	/**
 	 * 设置失效时间 当设置为<=0时,不超时
@@ -170,9 +137,7 @@ public class TimedSoftRefCache2<K, V> implements ISoftRefCache<K, V> {
 	 * @return
 	 */
 	public void setOverTime(int overTime) {
-		System.out.println("设置超时时间为:" + overTime + "min");
 		this.overTime = overTime * timeNumber;
-		backTrim(++countMod);
 	}
 
 	/**

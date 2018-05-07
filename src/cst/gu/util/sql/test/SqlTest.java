@@ -23,10 +23,8 @@ public class SqlTest {
 					 Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/isemptest?characterEncoding=utf8", "root","123456");  
 					 return conn;
 				} catch (ClassNotFoundException e) {
-					// TODO 自动生成的 catch 块
 					e.printStackTrace();
 				} catch (SQLException e) {
-					// TODO 自动生成的 catch 块
 					e.printStackTrace();
 				}  
 				

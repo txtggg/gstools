@@ -21,7 +21,6 @@ public class Gutest<K, V> {
 		Map<String,Object> lm = new LinkedHashMap<String, Object>(16,0.75F,true){
 			@Override
 			protected boolean removeEldestEntry(java.util.Map.Entry<String, Object> eldest) {
-				// TODO 自动生成的方法存根
 				return false;
 			}
 			/**
