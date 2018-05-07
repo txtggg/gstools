@@ -3,7 +3,7 @@ package test.cst.util.common.cache.softref;
 
 import org.junit.Test;
 
-import cst.util.common.cache.softref.TimedSoftRefCache;
+import cst.util.common.cache.softref.TimedSoftRefCache2;
 
 /**
  * @author gwc
@@ -16,7 +16,7 @@ public class TestTimedSoftRefCache<K, V> {
 	
 	@Test
 	public void testBackTrim() {
-		TimedSoftRefCache<String, String> tsrf = TimedSoftRefCache.newPutTimedInstance();
+		TimedSoftRefCache2<String, String> tsrf = TimedSoftRefCache2.newPutTimedInstance();
 		int s = 1000;
 		for(int i = 100;i<s;i++){
 			for(int x =0;x<s;x++){
