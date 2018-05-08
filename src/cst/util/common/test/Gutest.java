@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import cst.util.common.cache.softref.TimedSoftRefCache2;
 import cst.util.common.containers.Lists;
 import cst.util.common.containers.Maps;
+import cst.util.common.object.Objects;
 
 /**
  * @author gwc
@@ -16,36 +17,15 @@ import cst.util.common.containers.Maps;
  * @param <K>
  */
 public class Gutest<K, V> {
-	
+
 	public static void main(String[] args) {
-		Map<String,Object> lm = new LinkedHashMap<String, Object>(16,0.75F,true){
-			@Override
-			protected boolean removeEldestEntry(java.util.Map.Entry<String, Object> eldest) {
-				return false;
-			}
-			/**
-			 * 
-			 */
-			private static final long serialVersionUID = 1L;
-			
-		};
-		
-		lm.put("1", 1);
-		lm.put("2", 2);
-		lm.put("3", 3);
-		lm.put("4", 4);
-		lm.put("2", 4);
-		lm.get("3");
-//		lm.get("1");
-		for(Entry<String, Object> e : lm.entrySet()){
-			System.out.println(e.getKey());
-		}
-		
-	}
-	
-	public static void testSoftRef(Map<String,Object> map){
-		map = null;
+		int x = 1;
+		testSoftRef(x);
 	}
 
-	 
+	public static String testSoftRef(Object o) {
+		System.out.println(o.getClass());
+		return null;
+	}
+
 }

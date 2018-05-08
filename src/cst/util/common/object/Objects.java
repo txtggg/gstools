@@ -66,13 +66,21 @@ public class Objects {
 	}
 
 	/**
-	 * 尝试调用getInteger方法解析对象,如果发生异常,print异常后,返回
-	 * 
+	 * 尝试调用getInteger方法解析对象,如果发生异常,print异常后,返回null
 	 * @param o
 	 * @return
 	 */
 	public static Integer tryGetInteger(Object o) {
-		Integer i = null;
+		return tryGetInteger(o,null);
+	}
+	
+	/**
+	 * 尝试调用getInteger方法解析对象,如果发生异常,print异常后,返回defaultValue
+	 * @param o
+	 * @return
+	 */
+	public static Integer tryGetInteger(Object o,Integer defaultValue) {
+		Integer i = defaultValue;
 		try {
 			i = getInteger(o);
 		} catch (Exception e) {
@@ -111,7 +119,17 @@ public class Objects {
 	 * @return
 	 */
 	public static Long tryGetLong(Object o){
-		Long l = null;
+		return tryGetLong(o,null);
+	}
+	
+
+	/**
+	 * 尝试解析为Long,如果发生异常,则print并返回defaultValue
+	 * @param o
+	 * @return
+	 */
+	public static Long tryGetLong(Object o,Long defaultValue){
+		Long l = defaultValue;
 		try {
 			l = getLong(o);
 		} catch (Exception e) {
@@ -136,7 +154,11 @@ public class Objects {
 	}
 	
 	public static Double tryGetDouble(Object o){
-		Double d = null;
+		return tryGetDouble(o,null);
+	}
+	
+	public static Double tryGetDouble(Object o,Double defaultValue){
+		Double d = defaultValue;
 		try {
 			d = getDouble(o);
 		} catch (Exception e) {
@@ -145,6 +167,39 @@ public class Objects {
 		return d;
 	}
 	
+	/**
+	 * 
+	 * @param o
+	 * @return
+	 */
+	public static Float getFloat(Object o){
+		if (o == null) {
+			return null;
+		} else if (o instanceof Float) {
+			return (Float) o;
+		} else if (o instanceof Number) {
+			return ((Float) o).floatValue();
+		}
+		String s = o.toString().trim();
+		if (s.length() == 0) {
+			return null;
+		}
+		return Float.valueOf(s);
+	}
+	
+	public static Float tryGetFloat(Object o){
+		return tryGetFloat(o,null);
+	}
+	
+	public static Float tryGetFloat(Object o,Float defaultValue){
+		Float f = defaultValue;
+		try {
+			f = getFloat(o);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return f;
+	}
 
 	/**
 	 * 获取windows下指定class文件的所在路径
@@ -190,6 +245,7 @@ public class Objects {
 	 * @param valueS
 	 * @param targetType
 	 * @param charset:使用的字符集,如果为null则使用默认字符集
+	 * 此方法统一变为String后再执行解析,可以考虑后期优化速度
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -199,30 +255,48 @@ public class Objects {
 		}
 		Object rt = null;
 		String className = targetType.getName();
-		String valueS = value.toString();
 		if (className.equals("java.lang.String")) {
-			rt = valueS;
-		} else if (className.equals("int") || className.equals("java.lang.Integer")) {
-			rt = Integer.valueOf(valueS);
-		} else if (className.equals("double") || className.equals("java.lang.Double")) {
-			rt = Double.valueOf(valueS);
-		} else if (className.equals("long") || className.equals("java.lang.Long")) {
-			rt = Long.valueOf(valueS);
-		} else if (className.equals("float") || className.equals("java.lang.Float")) {
-			rt = Float.valueOf(valueS);
-		} else if (className.equals("boolean") || className.equals("java.lang.Boolean")) {
-			rt = Boolean.valueOf(valueS);
+			rt = value.toString();
+		} else if (className.equals("int") ) {
+			rt = tryGetInteger(value,0);
+		}  else if ( className.equals("java.lang.Integer")) {
+			rt = tryGetInteger(value);
+		} else if (className.equals("double")  ) {
+			rt = tryGetDouble(value,0D);
+		} else if (  className.equals("java.lang.Double")) {
+			rt = tryGetDouble(value);
+		}else if (className.equals("long")  ) {
+			rt = tryGetLong(value,0L);
+		} else if ( className.equals("java.lang.Long")) {
+			rt = tryGetLong(value);;
+		}else if (className.equals("float")  ) {
+			rt = tryGetFloat(value,0F);
+		} else if (  className.equals("java.lang.Float")) {
+			rt = tryGetFloat(value);
+		}else if (className.equals("boolean") ) {
+			rt = false;
+			try {
+				rt = Boolean.parseBoolean(value.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}else if (className.equals("boolean") || className.equals("java.lang.Boolean")) {
+			try {
+				rt = Boolean.valueOf(value.toString());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else if (className.equals("java.sql.Blob")) {
-				rt = Strings.getBlob(valueS, charset);
+				rt = Strings.getBlob(value.toString(), charset);
 		} else if (className.equals("java.sql.Date")) {
 			try {
-				rt = new java.sql.Date(LocalDateUtil.tryParseDate(valueS).getTime());
+				rt = new java.sql.Date(LocalDateUtil.tryParseDate(value.toString()).getTime());
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
 			}
 		} else if (className.equals("java.util.Date")) {
 			try {
-				rt = LocalDateUtil.tryParseDate(valueS);
+				rt = LocalDateUtil.tryParseDate(value.toString());
 			} catch (ParseException e) {
 				throw new RuntimeException(e);
 			}

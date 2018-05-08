@@ -19,6 +19,11 @@ import cst.gu.util.string.StringUtil;
  */
 public class Maps {
 
+	/**
+	 * 此方法可能导致错误,将于v2019被标记过期
+	 * @param map
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public static <K, V> Map<K, V> trim(Map<K, V> map) {
 		Map<K, V> map1 = null;

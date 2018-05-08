@@ -7,7 +7,6 @@ package cst.gu.litedao.config;
  */
 public abstract class LitedaoConfig {
 	private static String defaultCharset = null;
-	private static boolean cache = false;
 	
 	/**
 	 * 设置litedao的字符集编码格式.默认null,使用不带字符集的方法,可能导致系统升级时乱码
@@ -21,14 +20,4 @@ public abstract class LitedaoConfig {
 		return defaultCharset;
 	}
 
-	/**
-	 * 是否使用缓存,默认不适用
-	 */
-	public static void setCache(boolean useCache){
-		cache = useCache;
-	}
-	
-	public static boolean useCache(){
-		return cache;
-	}
 }

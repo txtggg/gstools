@@ -12,8 +12,8 @@ import cst.util.common.containers.Sets;
  * @author gwc
  * 使用后台线程进行trim操作,获取实例时可选择根据put或get时间来定义超时时间
  * @version 18.5 带时间限制的软引用缓存:超过指定时间(单位:分)或软引用失效都会导致清理缓存
- * 
- * @see TimedSoftRefCache2
+ * @deprecated
+ * @see TimedSoftRefCache
  * @param <V>
  * @param <K>
  */
